@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Quiz — Full Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--surface:#161922;--surface2:#1e2330;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--muted:#7a7f96;
+  --accent:#4f9eff;--accent-dim:rgba(79,158,255,0.12);
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,0.12);
+  --red:#f06a6a;--red-dim:rgba(240,106,106,0.12);
+  --amber:#f0a43a;--amber-dim:rgba(240,164,58,0.12);
+  --radius:12px;--radius-sm:8px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;padding:0}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(79,158,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(79,158,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.page-shell{position:relative;z-index:1;display:flex;min-height:100vh;width:100%}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border2);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden;order:2}
+.sidebar-header{padding:14px 14px 10px;border-bottom:1px solid var(--border)}
+.sidebar-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.mini-bars{display:flex;flex-direction:column;gap:5px}
+.mini-bar-row{display:flex;align-items:center;gap:7px}
+.mini-bar-label{font-size:10px;font-weight:600;min-width:38px;letter-spacing:.04em}
+.mini-bar-label.correct{color:var(--green)}
+.mini-bar-label.wrong{color:var(--red)}
+.mini-bar-track{flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width .4s ease;min-width:0}
+.mini-bar-fill.correct{background:var(--green)}
+.mini-bar-fill.wrong{background:var(--red)}
+.mini-bar-count{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);min-width:22px;text-align:right}
+.pnums-scroll{flex:1;overflow-y:auto;padding:10px 10px 16px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.pnums-scroll::-webkit-scrollbar{width:4px}
+.pnums-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-col{flex:1;min-width:0;order:1;display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem 4rem}
+.wrap{width:100%;max-width:680px}
+
+/* header */
+.header{text-align:center;margin-bottom:1.75rem}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(79,158,255,0.25);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:10px}
+.title{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.subtitle{font-size:13px;color:var(--muted);margin-top:5px}
+
+/* filter tabs */
+.tabs{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.tab:hover{border-color:var(--accent);color:var(--accent)}
+.tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.stat-val{font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.blue{color:var(--accent)}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
+
+.pnums{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-start}
+.pnum{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;font-family:'IBM Plex Mono',monospace;cursor:pointer;border:1.5px solid var(--border2);color:var(--muted);background:var(--surface2);transition:all .2s}
+.pnum:hover{border-color:var(--accent);color:var(--accent)}
+.pnum.current{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.pnum.correct{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.pnum.wrong{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.pnum.correct.current,.pnum.wrong.current{outline:2px solid rgba(255,255,255,0.35);outline-offset:2px}
+.pnum.hidden{display:none}
+
+/* track */
+.track{height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin-bottom:1.25rem}
+.fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .4s ease}
+
+/* question card */
+.q-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:1.75rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.q-card.tf::before{background:linear-gradient(90deg,var(--accent),transparent)}
+.q-card.mcq::before{background:linear-gradient(90deg,var(--amber),transparent)}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.q-index{font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+.q-index.tf{color:var(--accent)}.q-index.mcq{color:var(--amber)}
+.q-type{font-size:10px;background:var(--surface2);color:var(--muted);padding:3px 10px;border-radius:20px;border:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em}
+.q-text{font-size:16px;font-weight:500;line-height:1.6;color:var(--text);margin-bottom:1.25rem}
+
+/* TF buttons */
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans-btn{padding:13px 18px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.ans-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.ans-btn:disabled{cursor:default}
+.ans-btn.correct{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.ans-btn.wrong{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+
+/* MCQ options */
+.mcq-opts{display:flex;flex-direction:column;gap:9px}
+.opt-btn{padding:12px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-weight:400;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:12px}
+.opt-btn:hover:not(:disabled){border-color:var(--amber);background:var(--amber-dim);color:var(--amber)}
+.opt-btn:disabled{cursor:default}
+.opt-btn.correct{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.opt-btn.wrong{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.opt-btn.reveal{background:var(--green-dim);border-color:var(--green);color:var(--green);opacity:.65}
+.opt-label{font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;min-width:18px;opacity:.6}
+
+/* explanation */
+.explanation{margin-top:1rem;padding:13px 15px;background:var(--surface2);border-radius:var(--radius-sm);border-right:3px solid var(--green);font-size:13px;color:#c5d0e8;line-height:1.7;direction:rtl;text-align:right;display:none}
+.explanation.show{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.exp-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:5px;direction:ltr;text-align:left}
+.exp-chosen{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:9px;font-size:12px;direction:rtl;text-align:right}
+.exp-chosen.chosen-correct{background:var(--green-dim);border:1px solid rgba(62,207,142,0.3);color:var(--green)}
+.exp-chosen.chosen-wrong{background:var(--red-dim);border:1px solid rgba(240,106,106,0.3);color:#f09090}
+.chosen-icon{font-size:14px}
+.chosen-correct-ans{color:var(--green);font-size:12px}
+
+/* exam tip */
+.exp-tip{margin-top:10px;padding:9px 12px;background:rgba(240,164,58,0.07);border:1px solid rgba(240,164,58,0.25);border-radius:var(--radius-sm);font-size:12px;color:#d4b483;line-height:1.7;direction:rtl;text-align:right}
+.tip-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;direction:ltr;text-align:left}
+
+/* sidebar filter buttons */
+.sidebar-filter-btns{display:flex;gap:6px;margin-bottom:10px}
+.sf-btn{flex:1;padding:7px 4px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;color:var(--muted)}
+.sf-btn:hover{opacity:.85}
+.sf-btn.sf-correct{border-color:rgba(62,207,142,0.3);color:var(--green)}
+.sf-btn.sf-correct:hover,.sf-btn.sf-correct.active{background:var(--green-dim);border-color:var(--green)}
+.sf-btn.sf-wrong{border-color:rgba(240,106,106,0.3);color:var(--red)}
+.sf-btn.sf-wrong:hover,.sf-btn.sf-wrong.active{background:var(--red-dim);border-color:var(--red)}
+.sf-btn.sf-reset{border-color:rgba(240,164,58,0.3);color:var(--amber)}
+.sf-btn.sf-reset:hover{background:var(--amber-dim);border-color:var(--amber)}
+.sf-group{display:flex;gap:3px;flex:1}
+.sf-group .sf-btn{flex:1}
+.sf-expand{padding:7px 6px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;color:var(--muted);display:none}
+.sf-expand:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.sidebar-filter-btns{display:flex;gap:6px;margin-bottom:10px;align-items:center}
+.sf-group:has(.sf-btn.active) .sf-expand{display:flex;align-items:center;justify-content:center}
+
+/* nav */
+.nav-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nav-btn{padding:11px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;font-weight:500;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.nav-btn:hover:not(:disabled){background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+
+/* result */
+.result-wrap{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:2.5rem 2rem;text-align:center}
+.result-circle{width:110px;height:110px;border-radius:50%;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;font-family:'IBM Plex Mono',monospace;border:3px solid}
+.result-title{font-size:22px;font-weight:700;margin-bottom:6px}
+.result-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.result-stat{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border)}
+.result-stat-val{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.result-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.section-scores{margin-bottom:1.5rem}
+.section-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.section-row:last-child{border-bottom:none}
+.section-name{font-size:13px;color:var(--muted)}
+.section-val{font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.restart-btn{padding:12px 32px;border-radius:var(--radius-sm);border:1.5px solid var(--accent);background:var(--accent-dim);color:var(--accent);font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .2s}
+.restart-btn:hover{background:var(--accent);color:#fff}
+
+/* ── MOBILE BOTTOM DRAWER ── */
+.mob-bar{display:none}
+
+@media(max-width:760px){
+  /* hide desktop sidebar */
+  .sidebar{display:none}
+  .main-col{padding:1rem .75rem 5.5rem}
+
+  /* sticky bottom action bar */
+  .mob-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    position:fixed;bottom:0;left:0;right:0;z-index:100;
+    background:var(--surface);border-top:1px solid var(--border2);
+    padding:10px 14px;gap:8px;
+  }
+  .mob-bar-stats{display:flex;gap:10px;align-items:center}
+  .mob-stat{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+  .mob-stat.cor{color:var(--green)}
+  .mob-stat.wrg{color:var(--red)}
+  .mob-stat span{font-size:10px;color:var(--muted);font-weight:400;font-family:'Space Grotesk',sans-serif}
+  .mob-drawer-btn{
+    padding:8px 14px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border2);background:var(--surface2);
+    color:var(--muted);font-size:12px;font-weight:600;
+    font-family:'Space Grotesk',sans-serif;cursor:pointer;
+    display:flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap;
+  }
+  .mob-drawer-btn:hover,.mob-drawer-btn.open{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+  .mob-sf-btns{display:flex;gap:6px}
+  .mob-sf-btn{
+    width:34px;height:34px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border2);background:var(--surface2);
+    font-size:13px;font-weight:700;cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mob-sf-btn.cor{border-color:rgba(62,207,142,0.3);color:var(--green)}
+  .mob-sf-btn.cor.active{background:var(--green-dim);border-color:var(--green)}
+  .mob-sf-btn.wrg{border-color:rgba(240,106,106,0.3);color:var(--red)}
+  .mob-sf-btn.wrg.active{background:var(--red-dim);border-color:var(--red)}
+  .mob-sf-btn.rst{border-color:rgba(240,164,58,0.3);color:var(--amber)}
+  .mob-sf-btn.rst:hover{background:var(--amber-dim);border-color:var(--amber)}
+  .mob-sf-btn.all{border-color:rgba(79,158,255,0.3);color:var(--accent);display:none}
+  .mob-sf-btn.all.visible{display:flex}
+  .mob-sf-btn.all:hover{background:var(--accent-dim);border-color:var(--accent)}
+
+  /* drawer overlay */
+  .mob-drawer{
+    position:fixed;bottom:-100%;left:0;right:0;z-index:99;
+    background:var(--surface);border-top:1px solid var(--border2);
+    border-radius:16px 16px 0 0;
+    padding:16px 16px 80px;
+    max-height:60vh;overflow-y:auto;
+    transition:bottom .3s cubic-bezier(.4,0,.2,1);
+    scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+  }
+  .mob-drawer.open{bottom:0}
+  .mob-drawer-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
+  .mob-drawer-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .mob-drawer .pnums{justify-content:flex-start;gap:6px}
+  .mob-drawer .pnum{width:32px;height:32px;font-size:11px}
+
+  /* mini progress in drawer */
+  .mob-drawer-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+
+  /* overlay dim */
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
+  .mob-overlay.open{display:block}
+
+  /* general sizing */
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:20px}
+  .q-text{font-size:14px}
+  .q-card{padding:1.25rem 1rem}
+  .ans-btn{padding:12px 14px;font-size:13px}
+  .opt-btn{padding:10px 12px;font-size:13px}
+  .nav-btn{padding:10px 12px;font-size:13px}
+  .result-wrap{padding:1.75rem 1rem}
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+
+  <!-- MAIN CONTENT -->
+  <div class="main-col">
+    <div class="wrap">
+      <div class="header">
+        <div class="badge">📡 IT Course</div>
+        <h1 class="title">Full IT Exam Quiz</h1>
+        <p class="subtitle">True/False + MCQ · Explanation in Arabic after each answer</p>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" onclick="setFilter('all')">All Questions</button>
+        <button class="tab" onclick="setFilter('tf')">True / False</button>
+        <button class="tab" onclick="setFilter('mcq')">MCQ</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-val blue" id="s-q">1</div><div class="stat-lbl">Question</div></div>
+        <div class="stat"><div class="stat-val" id="s-total" style="color:var(--muted)">—</div><div class="stat-lbl">Total</div></div>
+        <div class="stat"><div class="stat-val green" id="s-cor">0</div><div class="stat-lbl">Correct</div></div>
+        <div class="stat"><div class="stat-val red" id="s-wrg">0</div><div class="stat-lbl">Wrong</div></div>
+      </div>
+
+      <div class="track"><div class="fill" id="fill" style="width:0%"></div></div>
+      <div id="main"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Questions</div>
+      <div class="sidebar-filter-btns">
+        <div class="sf-group">
+          <button class="sf-btn sf-correct" onclick="setSideFilter('correct')" id="sfbtn-correct" title="Correct only">✔</button>
+          <button class="sf-expand sf-correct-exp" onclick="showAll()" id="sfexp-correct" title="Show all questions">⊞</button>
+        </div>
+        <div class="sf-group">
+          <button class="sf-btn sf-wrong" onclick="setSideFilter('wrong')" id="sfbtn-wrong" title="Wrong only">✘</button>
+          <button class="sf-expand sf-wrong-exp" onclick="showAll()" id="sfexp-wrong" title="Show all questions">⊞</button>
+        </div>
+        <button class="sf-btn sf-reset" onclick="fullReset()" id="sfbtn-reset" title="Reset quiz">↺</button>
+      </div>
+      <div class="mini-bars">
+        <div class="mini-bar-row">
+          <span class="mini-bar-label correct">✔ Correct</span>
+          <div class="mini-bar-track"><div class="mini-bar-fill correct" id="bar-correct" style="width:0%"></div></div>
+          <span class="mini-bar-count" id="bar-cor-count">0</span>
+        </div>
+        <div class="mini-bar-row">
+          <span class="mini-bar-label wrong">✘ Wrong</span>
+          <div class="mini-bar-track"><div class="mini-bar-fill wrong" id="bar-wrong" style="width:0%"></div></div>
+          <span class="mini-bar-count" id="bar-wrg-count">0</span>
+        </div>
+      </div>
+    </div>
+    <div class="pnums-scroll">
+      <div class="pnums" id="pnums"></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- MOBILE BOTTOM BAR -->
+<div class="mob-bar">
+  <div class="mob-bar-stats">
+    <div class="mob-stat cor">
+      <span id="mob-cor">0</span><span>Correct</span>
+    </div>
+    <div class="mob-stat wrg">
+      <span id="mob-wrg">0</span><span>Wrong</span>
+    </div>
+  </div>
+  <div class="mob-sf-btns">
+    <button class="mob-sf-btn cor" id="mob-sfbtn-correct" onclick="setSideFilter('correct')" title="Correct only">✔</button>
+    <button class="mob-sf-btn wrg" id="mob-sfbtn-wrong"   onclick="setSideFilter('wrong')"   title="Wrong only">✘</button>
+    <button class="mob-sf-btn all" id="mob-sfbtn-all"     onclick="showAll()"                title="Show all">⊞</button>
+    <button class="mob-sf-btn rst"                         onclick="fullReset()"              title="Reset">↺</button>
+  </div>
+  <button class="mob-drawer-btn" id="mob-drawer-btn" onclick="toggleDrawer()">☰ Questions</button>
+</div>
+
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeDrawer()"></div>
+
+<!-- MOBILE DRAWER -->
+<div class="mob-drawer" id="mob-drawer">
+  <div class="mob-drawer-handle"></div>
+  <div class="mob-drawer-title">Questions Progress</div>
+  <div class="mob-drawer-bars">
+    <div class="mini-bar-row">
+      <span class="mini-bar-label correct">✔ Correct</span>
+      <div class="mini-bar-track"><div class="mini-bar-fill correct" id="mob-bar-correct" style="width:0%"></div></div>
+      <span class="mini-bar-count" id="mob-bar-cor-count">0</span>
+    </div>
+    <div class="mini-bar-row">
+      <span class="mini-bar-label wrong">✘ Wrong</span>
+      <div class="mini-bar-track"><div class="mini-bar-fill wrong" id="mob-bar-wrong" style="width:0%"></div></div>
+      <span class="mini-bar-count" id="mob-bar-wrg-count">0</span>
+    </div>
+  </div>
+  <div class="pnums" id="mob-pnums"></div>
+</div>
+
+<script>
+// type: 'tf' | 'mcq'
+// ans: true/false for tf | index (0-based) for mcq
+const ALL = [
+  // ── PAGE 1 TRUE/FALSE (original) ──
+  {type:'tf',q:"An information system (IS) is a combination of people, procedures, software, hardware, data, and the Internet.",ans:true,exp:"صح ✅ — نظام المعلومات يضم كل هذه العناصر معاً لمعالجة البيانات وتحويلها إلى معلومات مفيدة.",tip:"💡 لو السؤال ذكر كل العناصر (people, software, hardware, data, Internet) → الجواب True، IS تجمعهم كلهم."},
+  {type:'tf',q:"The program is identical to software.",ans:true,exp:"صح ✅ — مصطلح Program وSoftware يُستخدمان بنفس المعنى للإشارة إلى التعليمات البرمجية التي تُشغّل الحاسوب.",tip:"💡 لو شفت Program = Software → True، المصطلحان مترادفان."},
+  {type:'tf',q:"Operating Systems belong to System Software.",ans:true,exp:"صح ✅ — أنظمة التشغيل كـWindows وLinux تُصنَّف ضمن System Software لأنها تُدير موارد الجهاز.",tip:"💡 لو شفت OS مع System Software → True، أنظمة التشغيل برامج نظام."},
+  {type:'tf',q:"Operating Systems belong to System Hardware.",ans:false,exp:"خطأ ❌ — أنظمة التشغيل برامج (Software) وليست مكونات مادية (Hardware).",tip:"💡 لو شفت OS مع Hardware → False، OS برنامج مش hardware."},
+  {type:'tf',q:"Device Drivers belong to Data.",ans:false,exp:"خطأ ❌ — Device Drivers هي System Software تُتيح التواصل بين نظام التشغيل والأجهزة، وليست بيانات.",tip:"💡 لو شفت Device Drivers مع Data → False، Drivers هي System Software مش بيانات."},
+  {type:'tf',q:"The most powerful computer is the Midrange computer.",ans:false,exp:"خطأ ❌ — أقوى أنواع الحاسبات هو الـSupercomputer، وليس الـMidrange.",tip:"💡 لو شفت Midrange = most powerful → False، الأقوى هو Supercomputer."},
+  {type:'tf',q:"Supercomputers are the most powerful computers.",ans:true,exp:"صح ✅ — الـSupercomputers تُستخدم في العمليات الحسابية البالغة التعقيد كالأبحاث العلمية.",tip:"💡 لو شفت Supercomputer + most powerful → True، ده صح دايماً."},
+  {type:'tf',q:"The Memory of the system unit is the Hard Disk.",ans:false,exp:"خطأ ❌ — ذاكرة وحدة النظام تشير إلى RAM، أما القرص الصلب فهو وحدة تخزين ثانوية.",tip:"💡 لو شفت Memory of system unit = Hard Disk → False، الذاكرة هي RAM مش HDD."},
+  {type:'tf',q:"RAM is Temporary storage.",ans:true,exp:"صح ✅ — الـRAM تحتفظ بالبيانات مؤقتاً أثناء التشغيل فقط وتُفقد عند إيقاف الجهاز.",tip:"💡 لو شفت RAM + Temporary → True، RAM بتتمسح لما تقفل الجهاز."},
+  {type:'tf',q:"The Internet is a global network connecting smaller networks around the world.",ans:true,exp:"صح ✅ — الإنترنت شبكة ضخمة تربط ملايين الشبكات الأصغر والأجهزة حول العالم.",tip:"💡 لو شفت الإنترنت + global network → True، ده تعريفه الصحيح."},
+  {type:'tf',q:"Web 1.0 supports strong social interaction between users.",ans:false,exp:"خطأ ❌ — الويب 1.0 كان للقراءة فقط (Read-Only) بلا تفاعل. التفاعل الاجتماعي جاء مع الويب 2.0.",tip:"💡 لو شفت Web 1.0 + social interaction → False، 1.0 للقراءة بس، التفاعل جاء مع 2.0."},
+  {type:'tf',q:"Web 2.0 allows dynamic content and social interaction.",ans:true,exp:"صح ✅ — الويب 2.0 أتاح التدوين والشبكات الاجتماعية والمحتوى الذي يصنعه المستخدمون.",tip:"💡 لو شفت Web 2.0 + social/dynamic → True، 2.0 هو عصر التفاعل والمحتوى المتغير."},
+  {type:'tf',q:"Web 4.0 focuses on artificial intelligence and the Internet of Things.",ans:true,exp:"صح ✅ — الويب 4.0 يهدف لدمج الذكاء الاصطناعي وإنترنت الأشياء (IoT) لإنشاء بيئات رقمية ذكية.",tip:"💡 لو شفت Web 4.0 + AI + IoT → True، الجيل الرابع يدمج الذكاء الاصطناعي وإنترنت الأشياء."},
+  {type:'tf',q:"The Internet cannot be used for education and e-learning.",ans:false,exp:"خطأ ❌ — الإنترنت يُستخدم على نطاق واسع في التعليم الإلكتروني عبر منصات كـCursera وEdX وغيرها.",tip:"💡 لو شفت الإنترنت + cannot + education → False، الإنترنت يُستخدم في التعليم الإلكتروني بكثرة."},
+  {type:'tf',q:"A browser is a program used to explore the web.",ans:true,exp:"صح ✅ — المتصفح برنامج يُتيح الوصول إلى صفحات الويب وعرضها. أمثلة: Chrome, Firefox, Edge.",tip:"💡 لو شفت browser + explore web → True، المتصفح هو برنامج تصفح الويب."},
+  {type:'tf',q:"Google Chrome and Mozilla Firefox are web browsers.",ans:true,exp:"صح ✅ — كلاهما متصفحان شهيران للوصول إلى صفحات الإنترنت.",tip:"💡 لو شفت Chrome أو Firefox → True، كلاهما متصفحان معروفان."},
+  {type:'tf',q:"A protocol is a set of rules for exchanging data between computers.",ans:true,exp:"صح ✅ — البروتوكول يحدد كيفية إرسال البيانات واستقبالها بين الأجهزة على الشبكة. مثال: HTTP, TCP/IP.",tip:"💡 لو شفت protocol + rules + data → True، البروتوكول = قواعد التبادل."},
+  {type:'tf',q:"Downloading means sending files from your computer to the Internet.",ans:false,exp:"خطأ ❌ — التنزيل هو استقبال الملفات من الإنترنت لجهازك. أما الإرسال فيُسمى Uploading.",tip:"💡 لو شفت Downloading = sending → False، الإرسال = Uploading، التنزيل = استقبال."},
+  {type:'tf',q:"PHP is often used on the server side.",ans:true,exp:"صح ✅ — PHP لغة تعمل على الخادم (Server-Side) لمعالجة البيانات وتوليد صفحات الويب ديناميكياً.",tip:"💡 لو شفت PHP + server side → True، PHP لغة خادم (Server-Side)."},
+  {type:'tf',q:"CSS is used to control the appearance of web pages.",ans:true,exp:"صح ✅ — CSS مسؤولة عن تنسيق صفحات الويب من ألوان وخطوط وتخطيط.",tip:"💡 لو شفت CSS + appearance/style → True، CSS مسؤولة عن التنسيق والألوان."},
+  {type:'tf',q:"Microsoft Excel is mainly used for editing images.",ans:false,exp:"خطأ ❌ — Excel برنامج جداول بيانات للحسابات والتحليل المالي، لا لتحرير الصور.",tip:"💡 لو شفت Excel + images → False، Excel للجداول والحسابات مش الصور."},
+  {type:'tf',q:"Microsoft PowerPoint is a presentation graphics program.",ans:true,exp:"صح ✅ — PowerPoint مُصمَّم لإنشاء العروض التقديمية التي تجمع نصوصاً وصوراً ورسوماً.",tip:"💡 لو شفت PowerPoint + presentation → True، ده تعريفه الصحيح."},
+  {type:'tf',q:"GUI stands for Graphical User Interface.",ans:true,exp:"صح ✅ — واجهة المستخدم الرسومية تُتيح التفاعل مع الحاسوب عبر أيقونات ونوافذ.",tip:"💡 لو شفت GUI → True، دايماً Graphical User Interface."},
+  {type:'tf',q:"Word Wrap automatically corrects spelling mistakes.",ans:false,exp:"خطأ ❌ — Word Wrap يُغلّف النص للسطر التالي تلقائياً. أما تصحيح الإملاء فهو وظيفة Spell Check.",tip:"💡 لو شفت Word Wrap + spelling → False، Word Wrap للنص فقط، تصحيح الإملاء = Spell Check."},
+  {type:'tf',q:"Icons and windows are parts of a Graphical User Interface (GUI).",ans:true,exp:"صح ✅ — الأيقونات والنوافذ هي المكونات الأساسية لأي GUI كنظام Windows.",tip:"💡 لو شفت icons + windows + GUI → True، دول المكونات الأساسية للـGUI."},
+  {type:'tf',q:"Presentation software combines text and visual objects.",ans:true,exp:"صح ✅ — برامج العروض التقديمية تدمج النصوص والصور والرسوم في شرائح منسقة.",tip:"💡 لو شفت Presentation software + text + visual → True، برامج العروض تجمع النصوص والصور."},
+  {type:'tf',q:"Animations can be used in presentation software.",ans:true,exp:"صح ✅ — تدعم برامج كـPowerPoint إضافة انتقالات ورسوم متحركة للشرائح.",tip:"💡 لو شفت Animations + presentation → True، PowerPoint وغيره بيدعم الأنيميشن."},
+  {type:'tf',q:"A flyer can be created using a word processor.",ans:true,exp:"صح ✅ — يمكن إنشاء المنشورات الدعائية ببرامج معالجة النصوص كـWord.",tip:"💡 لو شفت flyer + word processor → True، ممكن تعمل منشور بـWord."},
+  {type:'tf',q:"Vector images lose quality when resized.",ans:false,exp:"خطأ ❌ — الصور المتجهة (Vector) تحافظ على جودتها عند أي تكبير أو تصغير لأنها مبنية بمعادلات رياضية.",tip:"💡 لو شفت Vector + lose quality → False، Vector تحافظ على الجودة عند التكبير، اللي بيخسر جودته هو Bitmap."},
+  {type:'tf',q:"Video editors are used to edit and enhance videos.",ans:true,exp:"صح ✅ — برامج كـAdobe Premiere وDaVinci Resolve مُصممة لقص الفيديو وإضافة المؤثرات وتحسين الجودة.",tip:"💡 لو شفت video editors + edit/enhance → True، ده وصف صحيح لبرامج تحرير الفيديو."},
+
+  // ── PAGE 1 MCQ ──
+  {type:'mcq',q:"Hardware includes:",opts:["Data","Keyboard","System Software","Viruses"],ans:1,exp:"الإجابة: Keyboard ✅ — لوحة المفاتيح مكوّن مادي (Hardware). أما Data والبرامج والفيروسات فهي Software أو بيانات.",tip:"💡 لو السؤال عن Hardware → دور على الجهاز المادي الملموس (Keyboard, Mouse, Monitor). أي كلام عن برامج أو بيانات = مش hardware."},
+  {type:'mcq',q:"One of the best-known operating systems is:",opts:["Norton","Wiki","Word","Windows"],ans:3,exp:"الإجابة: Windows ✅ — Windows من Microsoft هو أشهر أنظمة التشغيل في العالم. Norton برنامج حماية، وWord برنامج معالجة نصوص.",tip:"💡 لو السؤال عن OS → دور على Windows/Linux/Mac. Norton = antivirus, Word = معالج نصوص."},
+  {type:'mcq',q:"The most common use of the Internet is:",opts:["Programming","Hardware design","Communication","Printing"],ans:2,exp:"الإجابة: Communication ✅ — التواصل (البريد الإلكتروني، الشبكات الاجتماعية، المحادثات) هو الاستخدام الأكثر شيوعاً للإنترنت.",tip:"💡 لو السؤال عن أكثر استخدام للإنترنت → الجواب دايماً Communication (تواصل)."},
+  {type:'mcq',q:"Which language is used to structure and present content on a web page?",opts:["Java","C++","Python","HTML"],ans:3,exp:"الإجابة: HTML ✅ — HTML (HyperText Markup Language) هي لغة الترميز المستخدمة لبناء هيكل صفحات الويب.",tip:"💡 لو شفت structure + web page → الجواب HTML، مش Java ولا Python."},
+  {type:'mcq',q:"One example of a Specialized application is:",opts:["Browsers","Graphic programs","Word","Social media apps"],ans:1,exp:"الإجابة: Graphic programs ✅ — برامج الرسوميات كـPhotoshop هي تطبيقات متخصصة (Specialized Applications) مصممة لمهام محددة.",tip:"💡 لو السؤال عن Specialized application → دور على برنامج متخصص لمهمة محددة (Graphic programs, CAD)."},
+  {type:'mcq',q:"The Memory of the system unit is:",opts:["Hard Disk","R.A.M","CD-ROM","Flash Memory"],ans:1,exp:"الإجابة: R.A.M ✅ — ذاكرة الوصول العشوائي (RAM) هي الذاكرة الرئيسية لوحدة النظام المستخدمة أثناء التشغيل.",tip:"💡 لو السؤال عن Memory of system unit → الجواب RAM دايماً، مش HDD ولا CD."},
+  {type:'mcq',q:"The Internet was first launched in:",opts:["1950","1969","1985","1995"],ans:1,exp:"الإجابة: 1969 ✅ — بدأ الإنترنت كمشروع ARPANET عام 1969 من قِبَل وزارة الدفاع الأمريكية.",tip:"💡 لو السؤال عن تاريخ الإنترنت → الجواب 1969 (مشروع ARPANET)."},
+  {type:'mcq',q:"ISP stands for:",opts:["Internet System Port","Internal Server Protocol","Internet Security Program","Internet Service Provider"],ans:3,exp:"الإجابة: Internet Service Provider ✅ — مزود خدمة الإنترنت هو الشركة التي تُتيح لك الاتصال بالإنترنت.",tip:"💡 لو شفت ISP → Internet Service Provider، الشركة اللي بتوفر الإنترنت."},
+  {type:'mcq',q:"Which of the following is a web browser?",opts:["Windows","Linux","Google Chrome","Java"],ans:2,exp:"الإجابة: Google Chrome ✅ — Chrome متصفح ويب. أما Windows وLinux فأنظمة تشغيل، وJava لغة برمجة.",tip:"💡 لو السؤال عن web browser → Google Chrome, Firefox, Edge. Windows/Linux = OS, Java = لغة برمجة."},
+  {type:'mcq',q:"Word Wrap means:",opts:["Delete text","Increase font size","Move text automatically to the next line","Add images"],ans:2,exp:"الإجابة: Move text automatically to the next line ✅ — Word Wrap ينقل النص تلقائياً للسطر التالي عند الوصول لنهاية السطر.",tip:"💡 لو شفت Word Wrap → الجواب دايماً انتقال النص تلقائياً للسطر التالي، مش تصحيح أو حذف."},
+  {type:'mcq',q:"E-mail stands for:",opts:["Electronic Mail","Easy Mail","Express Mail","Extended Mail"],ans:0,exp:"الإجابة: Electronic Mail ✅ — البريد الإلكتروني يعني البريد الرقمي الذي يُرسَل عبر الإنترنت.",tip:"💡 لو شفت E-mail → Electronic Mail دايماً."},
+  {type:'mcq',q:"Programs that block access to certain websites are called:",opts:["Browsers","Drivers","Editors","Filters"],ans:3,exp:"الإجابة: Filters ✅ — برامج الفلترة تُستخدم لحجب مواقع معينة كبرامج الرقابة الأبوية.",tip:"💡 لو شفت block + websites → الجواب Filters (برامج الفلترة/الحجب)."},
+  {type:'mcq',q:"A website that can be edited by users is called:",opts:["Blog","Wiki","Browser","Protocol"],ans:1,exp:"الإجابة: Wiki ✅ — الـWiki موقع تعاوني يمكن لأي مستخدم تعديل محتواه. أشهر مثال: Wikipedia.",tip:"💡 لو شفت edited by users → الجواب Wiki (مثل Wikipedia)."},
+  {type:'mcq',q:"A database is:",opts:["A type of hardware","A spreadsheet","A collection of related data","A presentation"],ans:2,exp:"الإجابة: A collection of related data ✅ — قاعدة البيانات مجموعة منظمة من البيانات المترابطة يمكن الوصول إليها وإدارتها بسهولة.",tip:"💡 لو شفت database → collection of related data، مش hardware ولا spreadsheet."},
+  {type:'mcq',q:"GUI stands for:",opts:["General User Internet Graphic","Universal Internet","Global User Interface","Graphical User Interface"],ans:3,exp:"الإجابة: Graphical User Interface ✅ — واجهة المستخدم الرسومية التي تستخدم الأيقونات والنوافذ بدلاً من الأوامر النصية.",tip:"💡 لو شفت GUI → Graphical User Interface دايماً."},
+  {type:'mcq',q:"Spell checker is used to:",opts:["Edit images","Create formulas","Correct spelling","Manage databases"],ans:2,exp:"الإجابة: Correct spelling ✅ — الـSpell Checker يكتشف ويصحح الأخطاء الإملائية في النصوص.",tip:"💡 لو شفت Spell checker → Correct spelling، مش صور ولا formulas."},
+  {type:'mcq',q:"Which of the following is a graphics program?",opts:["Photoshop","Word","Excel","Access"],ans:0,exp:"الإجابة: Photoshop ✅ — Photoshop من Adobe برنامج متخصص لتحرير الصور والرسوميات. Word لمعالجة النصوص وExcel للجداول وAccess لقواعد البيانات.",tip:"💡 لو السؤال عن graphics program → Photoshop. Word=نصوص, Excel=جداول, Access=قواعد بيانات."},
+  {type:'mcq',q:"Bitmap images are made of:",opts:["Lines","Pixels","Curves","Vectors"],ans:1,exp:"الإجابة: Pixels ✅ — الصور النقطية (Bitmap) مكونة من نقاط صغيرة تُسمى Pixels، لذا تفقد جودتها عند التكبير.",tip:"💡 لو شفت Bitmap → Pixels. لو شفت Vector → Mathematical shapes."},
+  {type:'mcq',q:"Vector images are made of:",opts:["Pixels","Text","Sound waves","Mathematical shapes"],ans:3,exp:"الإجابة: Mathematical shapes ✅ — الصور المتجهة (Vector) مبنية بمعادلات رياضية تجعلها تحافظ على جودتها عند أي تكبير.",tip:"💡 لو شفت Vector → Mathematical shapes. ده اللي بيخليها ما تخسرش جودتها."},
+  {type:'mcq',q:"Spreadsheet programs are used to:",opts:["Draw images","Analyze numeric data","Edit videos","Create websites"],ans:1,exp:"الإجابة: Analyze numeric data ✅ — برامج الجداول كـExcel مُصممة لتحليل البيانات الرقمية وإجراء الحسابات وإنشاء الرسوم البيانية.",tip:"💡 لو شفت Spreadsheet → Analyze numeric data (أرقام وحسابات)."},
+
+  // ── PAGE 1 TRUE/FALSE (second batch) ──
+  {type:'tf',q:"The motherboard controls communication in the computer system.",ans:true,exp:"صح ✅ — اللوحة الأم (Motherboard) هي المكوّن الرئيسي الذي يربط جميع مكوّنات الحاسوب ويتحكم في التواصل بينها.",tip:"💡 لو شفت motherboard + communication → True، اللوحة الأم هي الرابط بين كل المكونات."},
+  {type:'tf',q:"All devices connect directly to the CPU only.",ans:false,exp:"خطأ ❌ — الأجهزة تتصل بالمعالج عبر اللوحة الأم (Motherboard) وليس مباشرة بالـCPU فقط.",tip:"💡 لو شفت devices + directly + CPU only → False، الأجهزة تتصل عبر اللوحة الأم مش مباشرة بالـCPU."},
+  {type:'tf',q:"The CPU is known as the brain of the computer.",ans:true,exp:"صح ✅ — المعالج المركزي (CPU) يُعرف بـ'دماغ الحاسوب' لأنه يُنفّذ التعليمات ويُعالج البيانات.",tip:"💡 لو شفت CPU + brain → True، ده وصف ثابت للـCPU."},
+  {type:'tf',q:"The ALU performs logical and arithmetic operations.",ans:true,exp:"صح ✅ — وحدة الحساب والمنطق (ALU) مسؤولة عن العمليات الحسابية (جمع، طرح) والمنطقية (AND, OR, NOT).",tip:"💡 لو شفت ALU + logical + arithmetic → True، دي وظيفة ALU الأساسية."},
+  {type:'tf',q:"RAM is a type of permanent memory.",ans:false,exp:"خطأ ❌ — الـRAM ذاكرة مؤقتة (Volatile) تفقد محتواها عند إيقاف الجهاز. الذاكرة الدائمة هي ROM والقرص الصلب.",tip:"💡 لو شفت RAM + permanent → False، RAM مؤقتة (Volatile) تُمسح عند إيقاف الجهاز."},
+  {type:'tf',q:"ROM stands for Read-Only Memory.",ans:true,exp:"صح ✅ — ذاكرة القراءة فقط (ROM) تحتوي على بيانات ثابتة لا يمكن تعديلها عادةً، كبرامج التشغيل الأساسية (BIOS).",tip:"💡 لو شفت ROM → True، Read-Only Memory هو اسمه الكامل دايماً."},
+  {type:'tf',q:"Analog signals are discrete signals.",ans:false,exp:"خطأ ❌ — الإشارات التماثلية (Analog) مستمرة (Continuous)، أما الإشارات المتقطعة (Discrete) فهي خاصية الإشارات الرقمية (Digital).",tip:"💡 لو شفت Analog + discrete → False، Analog مستمرة، Discrete = Digital."},
+  {type:'tf',q:"Digital signals are continuous signals.",ans:false,exp:"خطأ ❌ — الإشارات الرقمية (Digital) متقطعة (Discrete) وتأخذ قيمتين فقط (0 أو 1)، أما المستمرة فهي Analog.",tip:"💡 لو شفت Digital + continuous → False، Digital متقطعة (Discrete)."},
+  {type:'tf',q:"A bit can store either 0 or 1.",ans:true,exp:"صح ✅ — الـBit هو أصغر وحدة بيانات في الحاسوب ويمكنه تخزين قيمة واحدة فقط: 0 أو 1.",tip:"💡 لو شفت bit + 0 or 1 → True، البت يخزن قيمة واحدة بس: 0 أو 1."},
+  {type:'tf',q:"A byte consists of 4 bits.",ans:false,exp:"خطأ ❌ — الـByte يتكون من 8 bits وليس 4. أما الـ4 bits فتُسمى Nibble.",tip:"💡 لو شفت byte = 4 → False، Byte = 8 bits، الـ4 bits = Nibble."},
+  {type:'tf',q:"Hexadecimal system uses 16 digits.",ans:true,exp:"صح ✅ — النظام الست عشري (Hexadecimal) يستخدم 16 رمزاً: الأرقام 0-9 والحروف A-F.",tip:"💡 لو شفت Hexadecimal + 16 → True، النظام السادس عشري = 16 رمز (0-9 + A-F)."},
+  {type:'tf',q:"All information must be converted into binary to be processed.",ans:true,exp:"صح ✅ — الحاسوب يعمل على النظام الثنائي (Binary)، لذا يجب تحويل جميع البيانات (نصوص، صور، صوت) إلى 0 و1 قبل المعالجة.",tip:"💡 لو شفت binary + processed + all data → True، الحاسوب يعمل بالثنائي فقط."},
+  {type:'tf',q:"Images do not need binary representation.",ans:false,exp:"خطأ ❌ — الصور تحتاج للتمثيل الثنائي مثل أي بيانات أخرى. كل pixel يُمثَّل بقيم ثنائية للألوان.",tip:"💡 لو شفت Images + don't need binary → False، كل البيانات بما فيها الصور تُمثَّل بصورة ثنائية."},
+  {type:'tf',q:"1 KB equals 1024 bytes.",ans:true,exp:"صح ✅ — 1 Kilobyte = 1024 Bytes (وليس 1000) لأن الحاسوب يعمل بالنظام الثنائي (2^10 = 1024).",tip:"💡 لو شفت 1 KB = 1024 → True، الحاسوب يعمل بالنظام الثنائي (2^10=1024)."},
+  {type:'tf',q:"A memory device cannot store information.",ans:false,exp:"خطأ ❌ — وظيفة وحدات الذاكرة هي تخزين المعلومات! سواء كانت RAM أو ROM أو قرص صلب أو Flash.",tip:"💡 لو شفت memory + cannot store → False، وظيفة الذاكرة هي التخزين!"},
+
+  // ── PAGE 2 MCQ ──
+  {type:'mcq',q:"The main board of a computer is called:",opts:["Motherboard","RAM","Hard disk","CPU"],ans:0,exp:"الإجابة: Motherboard ✅ — اللوحة الأم هي اللوحة الرئيسية التي تربط جميع مكوّنات الحاسوب معاً."},
+  {type:'mcq',q:"The brain of the computer is:",opts:["RAM","CPU","ROM","Monitor"],ans:1,exp:"الإجابة: CPU ✅ — المعالج المركزي يُعرف بـ'دماغ الحاسوب' لأنه يُنفّذ جميع التعليمات ويُعالج البيانات.",tip:"💡 لو شفت brain of computer → CPU دايماً."},
+  {type:'mcq',q:"The CPU consists of:",opts:["RAM and ROM","ALU and Control Unit","Input and Output","Disk and Memory"],ans:1,exp:"الإجابة: ALU and Control Unit ✅ — المعالج يتكون من وحدة الحساب والمنطق (ALU) ووحدة التحكم (CU) التي تُدير تنفيذ التعليمات."},
+  {type:'mcq',q:"The Control Unit:",opts:["Stores data","Performs calculations","Directs operations of the computer","Displays output"],ans:2,exp:"الإجابة: Directs operations of the computer ✅ — وحدة التحكم تُوجّه وتُنسّق عمليات المعالج وتتحكم في تدفق البيانات.",tip:"💡 لو شفت Control Unit → Controls operations (يتحكم ويُنسّق)، مش يحسب أو يخزن."},
+  {type:'mcq',q:"ALU is responsible for:",opts:["Storage","Arithmetic and logic operations","Input","Output"],ans:1,exp:"الإجابة: Arithmetic and logic operations ✅ — وحدة الحساب والمنطق مسؤولة عن العمليات الرياضية والمنطقية."},
+  {type:'mcq',q:"RAM stands for:",opts:["Read Access Memory","Random Access Memory","Run Access Memory","Real Access Memory"],ans:1,exp:"الإجابة: Random Access Memory ✅ — ذاكرة الوصول العشوائي تتيح الوصول السريع لأي خلية ذاكرة مباشرة."},
+  {type:'mcq',q:"ROM is:",opts:["Temporary memory","Permanent memory","Cache memory","Secondary memory"],ans:1,exp:"الإجابة: Permanent memory ✅ — ذاكرة القراءة فقط (ROM) دائمة لا تفقد محتواها عند إيقاف الجهاز وتحتوي على تعليمات التشغيل الأساسية.",tip:"💡 لو شفت ROM → Read-only (للقراءة فقط)."},
+  {type:'mcq',q:"Analog signals are:",opts:["Digital","Continuous","Binary","Discrete"],ans:1,exp:"الإجابة: Continuous ✅ — الإشارات التماثلية مستمرة وتأخذ قيماً غير محدودة (كالصوت البشري وموجات الراديو).",tip:"💡 لو شفت Analog → Continuous (مستمرة). Digital = Discrete."},
+  {type:'mcq',q:"A bit represents:",opts:["8 digits","2 states (0 or 1)","16 values","4 bits"],ans:1,exp:"الإجابة: 2 states (0 or 1) ✅ — الـBit هو أصغر وحدة بيانات ويمثّل حالتين فقط: 0 (إيقاف) أو 1 (تشغيل).",tip:"💡 لو شفت bit → 2 values فقط (0 أو 1)."},
+  {type:'mcq',q:"A byte equals:",opts:["2 bits","4 bits","8 bits","16 bits"],ans:2,exp:"الإجابة: 8 bits ✅ — الـByte يساوي 8 bits. وهو الوحدة الأساسية لتمثيل حرف واحد في الحاسوب."},
+  {type:'mcq',q:"Hexadecimal system uses:",opts:["2 digits","8 digits","10 digits","16 digits"],ans:3,exp:"الإجابة: 16 digits ✅ — النظام الست عشري يستخدم 16 رمزاً: 0-9 ثم A,B,C,D,E,F.",tip:"💡 لو شفت Hexadecimal → 16 digits (0-9 + A-F)."},
+  {type:'mcq',q:"ASCII stands for:",opts:["American Standard Code for Information Interchange","Advanced System Code","Automatic Code","None"],ans:0,exp:"الإجابة: American Standard Code for Information Interchange ✅ — رمز ASCII يُعيّن رقماً لكل حرف وعلامة ترقيم وعمل على الحاسوب.",tip:"💡 لو شفت ASCII → American Standard Code for Information Interchange."},
+  {type:'mcq',q:"Unicode uses:",opts:["8 bits","16 bits","32 bits","4 bits"],ans:1,exp:"الإجابة: 16 bits ✅ — Unicode يستخدم 16 bit لكل حرف مما يتيح تمثيل أكثر من 65,000 حرف من جميع لغات العالم.",tip:"💡 لو شفت Unicode → 16 bits (مش 8). بيدعم أكثر من 65,000 رمز."},
+  {type:'mcq',q:"Information in computers is stored as:",opts:["Decimal","Binary","Hexadecimal","Octal"],ans:1,exp:"الإجابة: Binary ✅ — الحاسوب يخزن ويعالج جميع البيانات في صورة ثنائية (0 و1) على المستوى الأساسي.",tip:"💡 لو شفت stored in computers → Binary دايماً."},
+  {type:'mcq',q:"Flash memory is:",opts:["Volatile","Non-volatile","Temporary","Input device"],ans:1,exp:"الإجابة: Non-volatile ✅ — ذاكرة Flash غير متطايرة تحتفظ بالبيانات حتى بعد إيقاف الجهاز (مثل USB Flash Drive).",tip:"💡 لو شفت Flash memory → Non-volatile (بتحتفظ بالبيانات بدون كهرباء)."},
+  {type:'mcq',q:"1 MB equals:",opts:["1024 bytes","1024 KB","1000 bytes","512 KB"],ans:1,exp:"الإجابة: 1024 KB ✅ — 1 Megabyte = 1024 Kilobytes = 1,048,576 bytes.",tip:"💡 لو شفت 1 MB → 1024 KB. القاعدة: كل وحدة = 1024 من اللي قبلها."},
+  {type:'mcq',q:"A memory device is used to:",opts:["Input data","Store data","Display data","Print data"],ans:1,exp:"الإجابة: Store data ✅ — وحدات الذاكرة مُصممة لتخزين البيانات والبرامج سواء مؤقتاً (RAM) أو دائماً (HDD/SSD).",tip:"💡 لو شفت memory device → Store data، وظيفتها التخزين."},
+  {type:'mcq',q:"Digital signals are:",opts:["Continuous","Analog","Sound waves","Discrete"],ans:3,exp:"الإجابة: Discrete ✅ — الإشارات الرقمية متقطعة وتأخذ قيماً محددة فقط (0 أو 1) على عكس الإشارات التماثلية المستمرة.",tip:"💡 لو شفت Digital signals → Discrete (متقطعة). Analog = Continuous."},
+  {type:'mcq',q:"The smallest unit of data is:",opts:["Byte","KB","MB","Bit"],ans:3,exp:"الإجابة: Bit ✅ — الـBit هو أصغر وحدة بيانات في الحاسوب. 8 bits = 1 Byte, 1024 Bytes = 1 KB.",tip:"💡 لو شفت smallest unit → Bit دايماً."},
+
+  // ── PAGE 2 TRUE/FALSE ──
+  {type:'tf',q:"A program is a set of instructions executed by a computer.",ans:true,exp:"صح ✅ — البرنامج هو مجموعة من التعليمات المكتوبة بلغة برمجة تُنفّذها وحدة المعالجة المركزية.",tip:"💡 لو شفت program + instructions → True، هذا تعريف البرنامج."},
+  {type:'tf',q:"Programming is the same as an algorithm.",ans:false,exp:"خطأ ❌ — الخوارزمية (Algorithm) هي الخطوات المنطقية لحل مشكلة، أما البرمجة فهي ترجمة هذه الخطوات إلى كود بلغة برمجية.",tip:"💡 لو شفت Programming = Algorithm → False، الخوارزمية خطوات منطقية، البرمجة ترجمتها لكود."},
+  {type:'tf',q:"An algorithm depends on a specific programming language.",ans:false,exp:"خطأ ❌ — الخوارزمية مستقلة عن أي لغة برمجية، يمكن كتابتها بالكلام العادي أو Pseudocode أو مخطط انسيابي.",tip:"💡 لو شفت algorithm + specific language → False، الخوارزمية مستقلة عن أي لغة."},
+  {type:'tf',q:"A program is an algorithm written in a programming language.",ans:true,exp:"صح ✅ — البرنامج هو تنفيذ الخوارزمية بلغة برمجية محددة كـPython أو Java ليتمكن الحاسوب من تنفيذها.",tip:"💡 لو شفت program = algorithm in language → True، البرنامج = تنفيذ الخوارزمية بلغة برمجية."},
+  {type:'tf',q:"Before writing a program, understanding the problem is not necessary.",ans:false,exp:"خطأ ❌ — فهم المشكلة هو الخطوة الأولى والأهم في حل المشكلات البرمجية. بدونها لا يمكن وضع خوارزمية صحيحة.",tip:"💡 لو شفت understanding problem is not necessary → False، فهم المشكلة هو الخطوة الأولى دايماً."},
+  {type:'tf',q:"Machine language uses binary digits (0 and 1).",ans:true,exp:"صح ✅ — لغة الآلة (Machine Language) هي اللغة الوحيدة التي يفهمها الحاسوب مباشرة وتتكون من 0 و1 فقط.",tip:"💡 لو شفت Machine language + binary → True، لغة الآلة = 0 و1 فقط."},
+  {type:'tf',q:"Machine language is easy to write and debug.",ans:false,exp:"خطأ ❌ — لغة الآلة صعبة جداً للكتابة والتصحيح لأنها تتكون من أرقام ثنائية فقط. لذلك ظهرت لغات أعلى مستوى.",tip:"💡 لو شفت Machine language + easy → False، لغة الآلة صعبة جداً للكتابة والتصحيح."},
+  {type:'tf',q:"Assembly language uses symbols instead of binary.",ans:true,exp:"صح ✅ — لغة التجميع (Assembly) تستخدم رموزاً مختصرة (Mnemonics) كـMOV وADD بدلاً من الأرقام الثنائية.",tip:"💡 لو شفت Assembly + symbols → True، Assembly تستخدم Mnemonics (رموز) بدل الثنائي."},
+  {type:'tf',q:"Assembly language does not need translation.",ans:false,exp:"خطأ ❌ — لغة التجميع تحتاج إلى مترجم يُسمى Assembler لتحويلها إلى لغة الآلة التي يفهمها الحاسوب.",tip:"💡 لو شفت Assembly + no translation → False، Assembly تحتاج Assembler للترجمة."},
+  {type:'tf',q:"High-level languages require a compiler.",ans:true,exp:"صح ✅ — اللغات عالية المستوى كـPython وJava تحتاج إلى Compiler أو Interpreter لترجمتها إلى لغة الآلة.",tip:"💡 لو شفت High-level + compiler → True، اللغات عالية المستوى تحتاج Compiler أو Interpreter."},
+  {type:'tf',q:"High-level languages focus more on hardware than problem-solving.",ans:false,exp:"خطأ ❌ — اللغات عالية المستوى تُركّز على حل المشكلات وسهولة القراءة، بعيداً عن تفاصيل الـHardware. تلك مهمة لغة الآلة والتجميع.",tip:"💡 لو شفت High-level + hardware focus → False، اللغات عالية المستوى تُركّز على حل المشكلات مش الـHardware."},
+  {type:'tf',q:"ASCII is a coding scheme.",ans:true,exp:"صح ✅ — ASCII نظام ترميز يُعيّن رقماً لكل حرف وعلامة ترقيم ورمز تحكم في الحاسوب.",tip:"💡 لو شفت ASCII + coding scheme → True، ASCII نظام ترميز للحروف والرموز."},
+  {type:'tf',q:"Unicode supports more characters than ASCII.",ans:true,exp:"صح ✅ — ASCII يدعم 128 حرفاً فقط، بينما Unicode يدعم أكثر من مليون رمز يشمل جميع لغات العالم.",tip:"💡 لو شفت Unicode + more than ASCII → True، Unicode أوسع بكثير (مليون+ رمز مقابل 128)."},
+  {type:'tf',q:"Unicode uses 8 bits per character.",ans:false,exp:"خطأ ❌ — Unicode يستخدم 16 bit لكل حرف (وليس 8)، مما يتيح تمثيل مجموعة واسعة جداً من الرموز والحروف.",tip:"💡 لو شفت Unicode + 8 bits → False، Unicode = 16 bits مش 8."},
+  {type:'tf',q:"4GL languages are procedural.",ans:false,exp:"خطأ ❌ — لغات الجيل الرابع (4GL) غير إجرائية (Non-procedural)، تُحدّد ماذا تريد وليس كيف تفعله. مثال: SQL.",tip:"💡 لو شفت 4GL + procedural → False، 4GL غير إجرائية (Non-procedural) مثل SQL."},
+  {type:'tf',q:"4GL languages increase programmer productivity.",ans:true,exp:"صح ✅ — لغات 4GL ترفع إنتاجية المبرمج لأنها تحتاج كوداً أقل لإنجاز نفس المهمة مقارنةً بلغات 3GL.",tip:"💡 لو شفت 4GL + productivity → True، 4GL ترفع الإنتاجية بكود أقل."},
+
+  // ── PAGE 3 TRUE/FALSE ──
+  {type:'tf',q:"Natural languages resemble human languages.",ans:true,exp:"صح ✅ — اللغات الطبيعية (Natural Languages) كاللغة العربية والإنجليزية تُشبه اللغة البشرية وتُمثّل الجيل الخامس (5GL) من لغات البرمجة.",tip:"💡 لو شفت Natural languages + human → True، اللغات الطبيعية تشبه لغتنا البشرية (الجيل 5GL)."},
+  {type:'tf',q:"Preprocessor is the last stage of program translation.",ans:false,exp:"خطأ ❌ — المعالج الأولي (Preprocessor) هو أول مرحلة في الترجمة، يعالج التوجيهات (#include) قبل المترجم (Compiler).",tip:"💡 لو شفت Preprocessor + last stage → False، Preprocessor هو أول مرحلة مش آخرها."},
+  {type:'tf',q:"Compiler checks syntax errors.",ans:true,exp:"صح ✅ — المترجم (Compiler) يفحص أخطاء الصياغة (Syntax Errors) ويُبلغ عنها قبل توليد الكود القابل للتنفيذ.",tip:"💡 لو شفت Compiler + syntax errors → True، المترجم يكتشف أخطاء الصياغة."},
+  {type:'tf',q:"Linker connects libraries to the program.",ans:true,exp:"صح ✅ — الرابط (Linker) يربط الكود الكائني (Object Code) بالمكتبات اللازمة لإنتاج الملف التنفيذي (.exe).",tip:"💡 لو شفت Linker + libraries → True، الرابط يربط المكتبات بالكود."},
+  {type:'tf',q:"The main() function is the starting point of execution.",ans:true,exp:"صح ✅ — في C++ كل برنامج يبدأ تنفيذه من الدالة main()، وهي نقطة الدخول الإلزامية لأي برنامج.",tip:"💡 لو شفت main() + starting point → True، main() هي بداية تنفيذ أي برنامج C++."},
+  {type:'tf',q:"Comments are executed by the program.",ans:false,exp:"خطأ ❌ — التعليقات (Comments) يتجاهلها المترجم تماماً ولا تُنفَّذ. غرضها توضيح الكود للمبرمج فقط.",tip:"💡 لو شفت Comments + executed → False، المترجم يتجاهل التعليقات تماماً."},
+  {type:'tf',q:"Identifiers can start with a number.",ans:false,exp:"خطأ ❌ — المعرّفات (Identifiers) يجب أن تبدأ بحرف أو شرطة سفلية (_)، ولا يجوز أن تبدأ برقم.",tip:"💡 لو شفت Identifier + starts with number → False، المعرّفات تبدأ بحرف أو _ مش رقم."},
+  {type:'tf',q:"Identifiers can include underscore (_).",ans:true,exp:"صح ✅ — الشرطة السفلية (_) مسموح بها في المعرّفات. مثال: student_name, _count كلها أسماء صالحة.",tip:"💡 لو شفت Identifier + underscore → True، _ مسموح بها في أسماء المعرّفات."},
+  {type:'tf',q:"Constants can change during program execution.",ans:false,exp:"خطأ ❌ — الثوابت (Constants) قيمها ثابتة لا تتغير طوال تنفيذ البرنامج. تُعرَّف بكلمة const في C++.",tip:"💡 لو شفت Constants + change → False، الثوابت ثابتة لا تتغير (const)."},
+  {type:'tf',q:"Variables can change their values.",ans:true,exp:"صح ✅ — المتغيرات (Variables) تُخصَّص لها قيم يمكن تغييرها أثناء تنفيذ البرنامج.",tip:"💡 لو شفت Variables + change → True، المتغيرات ممكن تتغير قيمتها."},
+  {type:'tf',q:"Every statement in C++ ends with a semicolon.",ans:true,exp:"صح ✅ — في C++ كل جملة تنتهي بفاصلة منقوطة (;)، وإغفالها يُسبّب خطأ في الصياغة (Syntax Error).",tip:"💡 لو شفت statement + semicolon → True، كل جملة في C++ لازم تنتهي بـ ; ."},
+  {type:'tf',q:"Directives are executed at runtime.",ans:false,exp:"خطأ ❌ — التوجيهات (Directives) كـ#include تُعالَج في مرحلة ما قبل الترجمة (Preprocessing) وليس وقت التنفيذ.",tip:"💡 لو شفت Directives + runtime → False، التوجيهات (#include) تُعالَج في Preprocessing قبل الترجمة."},
+  {type:'tf',q:"Libraries provide ready-made functions.",ans:true,exp:"صح ✅ — المكتبات (Libraries) تحتوي على دوال جاهزة كـcout وcin في <iostream> وsqrt في <cmath>.",tip:"💡 لو شفت Libraries + ready-made → True، المكتبات توفر دوال جاهزة مثل cout و sqrt."},
+  {type:'tf',q:"float is used for integer values.",ans:false,exp:"خطأ ❌ — float يُستخدم للأعداد العشرية (Decimal). للأعداد الصحيحة نستخدم int.",tip:"💡 لو شفت float + integer → False، float للأعداد العشرية، int للأعداد الصحيحة."},
+
+  // ── PAGE 3 MCQ ──
+  {type:'mcq',q:"A program is:",opts:["Hardware","Set of instructions","Device","Memory"],ans:1,exp:"الإجابة: Set of instructions ✅ — البرنامج مجموعة تعليمات مكتوبة بلغة برمجية تُنفّذها وحدة المعالجة المركزية.",tip:"💡 لو السؤال عن تعريف Program → Set of instructions، مش hardware ولا device."},
+  {type:'mcq',q:"Programming means:",opts:["Writing hardware","Building circuits","Using internet","Giving instructions to computer"],ans:3,exp:"الإجابة: Giving instructions to computer ✅ — البرمجة هي عملية كتابة التعليمات بلغة يفهمها الحاسوب لحل مشكلة معينة.",tip:"💡 لو السؤال عن تعريف Programming → Giving instructions to computer."},
+  {type:'mcq',q:"An algorithm is:",opts:["Hardware design","Language-specific code","Step-by-step solution","Memory unit"],ans:2,exp:"الإجابة: Step-by-step solution ✅ — الخوارزمية هي مجموعة خطوات منطقية منظمة لحل مشكلة، مستقلة عن أي لغة برمجية.",tip:"💡 لو السؤال عن Algorithm → Step-by-step solution، خطوات منطقية لحل مشكلة."},
+  {type:'mcq',q:"Machine language uses:",opts:["0 and 1","English","Symbols","Letters"],ans:0,exp:"الإجابة: 0 and 1 ✅ — لغة الآلة تتكون من 0 و1 فقط (Binary) وهي اللغة الوحيدة التي يفهمها الحاسوب مباشرة.",tip:"💡 لو شفت Machine language → 0 and 1 دايماً."},
+  {type:'mcq',q:"Assembly language needs:",opts:["Compiler","Assembler","Linker","Editor"],ans:1,exp:"الإجابة: Assembler ✅ — لغة التجميع تحتاج إلى برنامج يُسمى Assembler لتحويلها إلى لغة الآلة.",tip:"💡 لو شفت Assembly language → Assembler (مش Compiler)."},
+  {type:'mcq',q:"High-level languages require:",opts:["Assembler","CPU","RAM","Compiler"],ans:3,exp:"الإجابة: Compiler ✅ — اللغات عالية المستوى تحتاج Compiler أو Interpreter لترجمتها إلى لغة الآلة.",tip:"💡 لو شفت High-level → Compiler أو Interpreter."},
+  {type:'mcq',q:"ASCII stands for:",opts:["Advanced Code System","American Standard Code for Information Interchange","Automatic System Code","None"],ans:1,exp:"الإجابة: American Standard Code for Information Interchange ✅ — نظام ترميز أمريكي يُعيّن رقماً لكل حرف وعلامة.",tip:"💡 لو شفت ASCII → American Standard Code for Information Interchange."},
+  {type:'mcq',q:"Unicode uses:",opts:["16 bits","8 bits","32 bits","4 bits"],ans:0,exp:"الإجابة: 16 bits ✅ — Unicode يستخدم 16 bit لكل حرف مما يتيح تمثيل أكثر من 65,000 رمز من لغات العالم.",tip:"💡 لو شفت Unicode → 16 bits (مش 8). بيدعم أكثر من 65,000 رمز."},
+  {type:'mcq',q:"4GL languages are:",opts:["Machine languages","Procedural","Non-procedural","Binary"],ans:2,exp:"الإجابة: Non-procedural ✅ — لغات 4GL غير إجرائية، تُحدد ماذا تريد (What) لا كيف تفعله (How). مثال: SQL.",tip:"💡 لو شفت 4GL → Non-procedural (غير إجرائية)، مثل SQL."},
+  {type:'mcq',q:"Natural languages resemble:",opts:["Assembly","Binary","Machine code","Human language"],ans:3,exp:"الإجابة: Human language ✅ — اللغات الطبيعية تُحاكي اللغة البشرية وتُمثّل الجيل الخامس (5GL) من لغات البرمجة.",tip:"💡 لو شفت Natural languages → Human language (لغة بشرية = الجيل 5GL)."},
+  {type:'mcq',q:"First step in program translation:",opts:["Preprocessor","Compiler","Linker","Execution"],ans:0,exp:"الإجابة: Preprocessor ✅ — المعالج الأولي هو أول مرحلة، يعالج التوجيهات (#include, #define) قبل الترجمة.",tip:"💡 لو شفت first step in translation → Preprocessor دايماً (أول مرحلة)."},
+  {type:'mcq',q:"Compiler produces:",opts:["Source code","Object code","Text file","Image"],ans:1,exp:"الإجابة: Object code ✅ — المترجم يحوّل الكود المصدري (Source Code) إلى كود كائني (Object Code) قابل للربط.",tip:"💡 لو شفت Compiler produces → Object code (الكود الكائني)."},
+  {type:'mcq',q:"Linker does:",opts:["Syntax checking","Memory allocation","Editing","Linking libraries"],ans:3,exp:"الإجابة: Linking libraries ✅ — الرابط يربط الكود الكائني بالمكتبات اللازمة لإنتاج الملف التنفيذي النهائي.",tip:"💡 لو شفت Linker → Linking libraries (ربط المكتبات بالكود)."},
+  {type:'mcq',q:"main() function is:",opts:["Optional","Starting point","Not important","Ending point"],ans:1,exp:"الإجابة: Starting point ✅ — main() هي نقطة البداية الإلزامية لأي برنامج C++، منها يبدأ التنفيذ.",tip:"💡 لو شفت main() → Starting point، نقطة البداية الإلزامية."},
+  {type:'mcq',q:"Comments are:",opts:["Executed","Ignored","Compiled","Linked"],ans:1,exp:"الإجابة: Ignored ✅ — التعليقات يتجاهلها المترجم تماماً، غرضها توثيق الكود للمبرمج فقط.",tip:"💡 لو شفت Comments → Ignored (يتجاهلها المترجم)."},
+  {type:'mcq',q:"Identifier must:",opts:["Start with number","Start with letter","Include space","Include symbol"],ans:1,exp:"الإجابة: Start with letter ✅ — المعرّفات يجب أن تبدأ بحرف أو شرطة سفلية (_)، ولا تحتوي على مسافات أو رموز خاصة.",tip:"💡 لو شفت Identifier must → Start with letter (أو _، مش رقم)."},
+  {type:'mcq',q:"Which is a valid identifier?",opts:["studentAge","2x","name$","x-y"],ans:0,exp:"الإجابة: studentAge ✅ — يبدأ بحرف ولا يحتوي على رموز أو مسافات. أما 2x يبدأ برقم، وname$ و x-y تحتوي رموز غير مسموحة.",tip:"💡 لو السؤال عن valid identifier → ابحث عن اللي يبدأ بحرف وما فيهوش مسافات أو رموز أو أرقام في الأول."},
+  {type:'mcq',q:"Constant value:",opts:["Changes","Fixed","Random","Unknown"],ans:1,exp:"الإجابة: Fixed ✅ — الثوابت (Constants) قيمها ثابتة لا تتغير طوال تنفيذ البرنامج.",tip:"💡 لو شفت Constant → Fixed (ثابت لا يتغير)."},
+  {type:'mcq',q:"Variable value:",opts:["Fixed","Cannot change","Changes","None"],ans:2,exp:"الإجابة: Changes ✅ — المتغيرات (Variables) يمكن تغيير قيمها أثناء تنفيذ البرنامج.",tip:"💡 لو شفت Variable → Changes (يتغير)."},
+  {type:'mcq',q:"Statement ends with:",opts:[".","،",":","؛ (semicolon)"],ans:3,exp:"الإجابة: Semicolon (;) ✅ — في C++ كل جملة تنتهي بفاصلة منقوطة (;).",tip:"💡 لو شفت statement ends → Semicolon (;) في C++ دايماً."},
+  {type:'mcq',q:"char stores:",opts:["Integer","Character","Float","Double"],ans:1,exp:"الإجابة: Character ✅ — نوع البيانات char يُستخدم لتخزين حرف واحد مثل 'A' أو 'z'.",tip:"💡 لو شفت char → Character (حرف واحد مثل 'A')."},
+
+  // ── PAGE 4 MCQ ──
+  {type:'mcq',q:"float is used for:",opts:["Characters","Integers","Decimal numbers","Strings"],ans:2,exp:"الإجابة: Decimal numbers ✅ — float يُستخدم للأعداد العشرية كـ3.14 و2.5. للأعداد الصحيحة نستخدم int.",tip:"💡 لو شفت float → Decimal numbers (أعداد عشرية كـ3.14). int = صحيحة، char = حروف."},
+  {type:'mcq',q:"int is used for:",opts:["Characters","Integers","Text","Symbols"],ans:1,exp:"الإجابة: Integers ✅ — int يُستخدم لتخزين الأعداد الصحيحة مثل 5 و-3 و100.",tip:"💡 لو شفت int → Integers (أعداد صحيحة). float = عشرية."},
+  {type:'mcq',q:"Library example:",opts:["main","math.h","int","float"],ans:1,exp:"الإجابة: math.h ✅ — math.h (أو <cmath>) مكتبة تحتوي دوال رياضية كـsqrt() وpow(). أما main وint وfloat فليست مكتبات.",tip:"💡 لو السؤال عن Library → دور على اسم ملف بامتداد .h مثل math.h. main وint وfloat مش مكتبات."},
+  {type:'mcq',q:"#include is:",opts:["Variable","Directive","Function","Loop"],ans:1,exp:"الإجابة: Directive ✅ — #include توجيه (Preprocessor Directive) يُخبر المعالج الأولي بتضمين ملف مكتبة معين.",tip:"💡 لو شفت #include → Directive (توجيه للمعالج الأولي Preprocessor)."},
+  {type:'mcq',q:"Syntax means:",opts:["Rules","Meaning","Output","Input"],ans:0,exp:"الإجابة: Rules ✅ — الصياغة (Syntax) هي قواعد كتابة الكود الصحيح في لغة برمجية معينة.",tip:"💡 لو شفت Syntax → Rules (قواعد كتابة الكود الصحيح)."},
+  {type:'mcq',q:"Object code is:",opts:["Human-readable","English","Diagram","Machine-level"],ans:3,exp:"الإجابة: Machine-level ✅ — الكود الكائني (Object Code) هو الناتج من المترجم، يكون على مستوى الآلة قبل الربط النهائي.",tip:"💡 لو شفت Object code → Machine-level (مستوى الآلة، ناتج المترجم)."},
+  {type:'mcq',q:"Which is a high-level language?",opts:["Binary","Assembly","C","Machine"],ans:2,exp:"الإجابة: C ✅ — C (وC++) لغة عالية المستوى قابلة للقراءة البشرية. أما Binary وMachine language فمستوى منخفض، وAssembly مستوى منخفض أيضاً.",tip:"💡 لو السؤال عن High-level → C, C++, Java, Python. Binary وMachine وAssembly = Low-level."},
+  {type:'mcq',q:"Which is NOT a language type?",opts:["Machine","Assembly","High-level","Keyboard"],ans:3,exp:"الإجابة: Keyboard ✅ — Keyboard لوحة مفاتيح (Hardware) وليست نوع لغة برمجة. أنواع اللغات هي: Machine, Assembly, High-level, Natural.",tip:"💡 لو السؤال عن NOT a language type → دور على الحاجة اللي مش لغة برمجة. Keyboard = Hardware مش لغة."},
+
+  // ── PAGE 4 TRUE/FALSE ──
+  {type:'tf',q:"The motherboard controls communication between all computer components.",ans:true,exp:"صح ✅ — اللوحة الأم (Motherboard) هي المكوّن الرئيسي الذي يربط CPU والذاكرة وبطاقات التوسعة وكل مكوّنات الحاسوب.",tip:"💡 لو شفت motherboard + communication + all → True، اللوحة الأم تربط كل المكونات."},
+  {type:'tf',q:"The CPU is also called the microprocessor.",ans:true,exp:"صح ✅ — المعالج المركزي (CPU) يُسمى أيضاً Microprocessor، وهو الدارة المتكاملة التي تُنفّذ التعليمات.",tip:"💡 لو شفت CPU = microprocessor → True، مصطلحان لنفس الشيء."},
+  {type:'tf',q:"The ALU is responsible for controlling instructions.",ans:false,exp:"خطأ ❌ — التحكم في التعليمات مهمة وحدة التحكم (Control Unit). أما ALU فمسؤولة عن العمليات الحسابية والمنطقية.",tip:"💡 لو شفت ALU + controlling instructions → False، التحكم = Control Unit، ALU للحسابات والمنطق."},
+  {type:'tf',q:"RAM is a permanent memory.",ans:false,exp:"خطأ ❌ — الـRAM ذاكرة مؤقتة (Volatile) تفقد محتواها عند إيقاف الجهاز. الدائمة هي ROM وHDD.",tip:"💡 لو شفت RAM + permanent → False، RAM مؤقتة (Volatile)."},
+  {type:'tf',q:"ROM can be easily modified.",ans:false,exp:"خطأ ❌ — ROM (Read-Only Memory) لا يمكن تعديلها بسهولة في الظروف العادية، وُضعت بياناتها عند التصنيع.",tip:"💡 لو شفت ROM + easily modified → False، ROM للقراءة فقط (Read-Only)."},
+  {type:'tf',q:"Flash memory is a type of non-volatile memory.",ans:true,exp:"صح ✅ — ذاكرة Flash غير متطايرة (Non-volatile) تحتفظ بالبيانات بعد إيقاف الجهاز. مثل: USB Flash Drive وبطاقات SD.",tip:"💡 لو شفت Flash + non-volatile → True، Flash تحتفظ بالبيانات بدون طاقة."},
+  {type:'tf',q:"Analog signals are discrete signals.",ans:false,exp:"خطأ ❌ — الإشارات التماثلية (Analog) مستمرة (Continuous). الإشارات المتقطعة (Discrete) هي الرقمية (Digital).",tip:"💡 لو شفت Analog + discrete → False، Analog مستمرة، Discrete = Digital."},
+  {type:'tf',q:"Digital signals are continuous.",ans:false,exp:"خطأ ❌ — الإشارات الرقمية (Digital) متقطعة (Discrete) وتأخذ قيمتين فقط (0 أو 1).",tip:"💡 لو شفت Digital + continuous → False، Digital متقطعة."},
+  {type:'tf',q:"A bit can only be 0 or 1.",ans:true,exp:"صح ✅ — الـBit هو أصغر وحدة بيانات ويمثّل حالتين فقط: 0 (إيقاف) أو 1 (تشغيل).",tip:"💡 لو شفت bit + 0 or 1 → True."},
+  {type:'tf',q:"A byte consists of 4 bits.",ans:false,exp:"خطأ ❌ — الـByte = 8 bits. الـ4 bits تُسمى Nibble.",tip:"💡 لو شفت byte = 4 → False، Byte = 8 bits، الـ4 bits = Nibble."},
+  {type:'tf',q:"ASCII is used in personal computers.",ans:true,exp:"صح ✅ — ASCII هو نظام الترميز الأكثر استخداماً في الحاسبات الشخصية (PCs) لتمثيل النصوص الإنجليزية.",tip:"💡 لو شفت ASCII + personal computers → True، ASCII للـPCs."},
+  {type:'tf',q:"Unicode uses 8 bits only.",ans:false,exp:"خطأ ❌ — Unicode يستخدم 16 bit (وليس 8)، مما يتيح تمثيل أكثر من 65,000 رمز.",tip:"💡 لو شفت Unicode + 8 bits → False، Unicode = 16 bits."},
+  {type:'tf',q:"EBCDIC is used in mainframe computers.",ans:true,exp:"صح ✅ — EBCDIC (Extended Binary Coded Decimal Interchange Code) يُستخدم في الحاسبات الكبيرة (Mainframes) من IBM.",tip:"💡 لو شفت EBCDIC + mainframe → True."},
+  {type:'tf',q:"All data in computers must be converted to binary.",ans:true,exp:"صح ✅ — الحاسوب يعمل على النظام الثنائي، لذا كل البيانات (نصوص، صور، صوت) تُحوَّل إلى 0 و1.",tip:"💡 لو شفت all data + binary → True، الحاسوب يعمل ثنائياً فقط."},
+  {type:'tf',q:"Images cannot be stored in binary form.",ans:false,exp:"خطأ ❌ — الصور تُخزَّن ثنائياً تماماً كأي بيانات أخرى. كل Pixel يُمثَّل بقيم ثنائية للألوان.",tip:"💡 لو شفت Images + cannot + binary → False، الصور تُخزَّن ثنائياً مثل أي بيانات."},
+  {type:'tf',q:"The Control Unit performs arithmetic operations.",ans:false,exp:"خطأ ❌ — العمليات الحسابية والمنطقية مهمة ALU. وحدة التحكم (Control Unit) تُوجّه وتُنسّق تنفيذ التعليمات.",tip:"💡 لو شفت Control Unit + arithmetic → False، الحسابات = ALU، Control Unit تتحكم وتُنسّق."},
+  {type:'tf',q:"The ALU performs logical operations.",ans:true,exp:"صح ✅ — ALU تُنفّذ العمليات المنطقية (AND, OR, NOT, Compare) إضافة للعمليات الحسابية.",tip:"💡 لو شفت ALU + logical → True، ALU تنفذ العمليات المنطقية والحسابية."},
+  {type:'tf',q:"1 KB = 1000 bytes exactly.",ans:false,exp:"خطأ ❌ — 1 KB = 1024 bytes (2^10)، وليس 1000. الحاسوب يعمل بالنظام الثنائي.",tip:"💡 لو شفت 1 KB = 1000 → False، 1 KB = 1024 bytes (2^10)."},
+  {type:'tf',q:"A bit is the smallest unit of data.",ans:true,exp:"صح ✅ — الـBit هو أصغر وحدة بيانات في الحاسوب. التسلسل: Bit → Nibble (4) → Byte (8) → KB (1024B).",tip:"💡 لو شفت smallest unit → True، Bit هو أصغر وحدة بيانات."},
+  {type:'tf',q:"Microprocessor is the brain of the computer.",ans:true,exp:"صح ✅ — المعالج الدقيق (Microprocessor/CPU) يُعرف بـ'دماغ الحاسوب' لأنه يُنفّذ جميع التعليمات ويتحكم في العمليات.",tip:"💡 لو شفت Microprocessor/CPU + brain → True."},
+
+  // ── PAGE 5 MCQ ──
+  {type:'mcq',q:"The brain of the computer is:",opts:["RAM","CPU","ROM","Hard Disk"],ans:1,exp:"الإجابة: CPU ✅ — المعالج المركزي هو دماغ الحاسوب، يُنفّذ التعليمات ويعالج البيانات.",tip:"💡 لو شفت brain of computer → CPU دايماً."},
+  {type:'mcq',q:"The Control Unit:",opts:["Stores data","Performs math","Controls operations","Displays output"],ans:2,exp:"الإجابة: Controls operations ✅ — وحدة التحكم تُوجّه وتُنسّق تنفيذ التعليمات وتتحكم في تدفق البيانات بين مكوّنات الحاسوب.",tip:"💡 لو شفت Control Unit → Controls operations (يتحكم ويُنسّق)، مش يحسب أو يخزن."},
+  {type:'mcq',q:"ALU stands for:",opts:["Arithmetic Logic Unit","Advanced Logic Unit","Arithmetic Link Unit","None"],ans:0,exp:"الإجابة: Arithmetic Logic Unit ✅ — وحدة الحساب والمنطق مسؤولة عن العمليات الرياضية والمقارنات المنطقية.",tip:"💡 لو شفت ALU → Arithmetic Logic Unit دايماً."},
+  {type:'mcq',q:"RAM is:",opts:["Permanent","Volatile","External","Optical"],ans:1,exp:"الإجابة: Volatile ✅ — الـRAM متطايرة (Volatile) تفقد محتواها عند إيقاف الجهاز.",tip:"💡 لو شفت RAM → Volatile (مؤقتة تُمسح عند الإيقاف)."},
+  {type:'mcq',q:"ROM is:",opts:["Temporary","Writable","Read-only","Volatile"],ans:2,exp:"الإجابة: Read-only ✅ — ROM للقراءة فقط، تحتوي على بيانات ثابتة مُخزَّنة منذ التصنيع.",tip:"💡 لو شفت ROM → Read-only (للقراءة فقط)."},
+  {type:'mcq',q:"Flash memory is:",opts:["Volatile","Non-volatile","Temporary","None"],ans:1,exp:"الإجابة: Non-volatile ✅ — Flash memory غير متطايرة، تحتفظ بالبيانات دون طاقة كهربائية.",tip:"💡 لو شفت Flash memory → Non-volatile (بتحتفظ بالبيانات بدون كهرباء)."},
+  {type:'mcq',q:"A bit represents:",opts:["8 values","2 values","4 values","16 values"],ans:1,exp:"الإجابة: 2 values ✅ — الـBit يمثّل قيمتين فقط: 0 أو 1.",tip:"💡 لو شفت bit → 2 values فقط (0 أو 1)."},
+  {type:'mcq',q:"Byte equals:",opts:["4 bits","8 bits","16 bits","32 bits"],ans:1,exp:"الإجابة: 8 bits ✅ — 1 Byte = 8 bits. هو الوحدة الأساسية لتمثيل حرف في الحاسوب.",tip:"💡 لو شفت Byte → 8 bits دايماً."},
+  {type:'mcq',q:"ASCII is used for:",opts:["Images","Encoding characters","Audio","Video"],ans:1,exp:"الإجابة: Encoding characters ✅ — ASCII نظام ترميز يُعيّن قيمة رقمية لكل حرف وعلامة ترقيم.",tip:"💡 لو شفت ASCII → Encoding characters (ترميز الحروف والرموز)."},
+  {type:'mcq',q:"Unicode uses:",opts:["8 bits","16 bits","4 bits","2 bits"],ans:1,exp:"الإجابة: 16 bits ✅ — Unicode يستخدم 16 bit لتمثيل أكثر من 65,000 رمز من لغات العالم.",tip:"💡 لو شفت Unicode → 16 bits (مش 8). بيدعم أكثر من 65,000 رمز."},
+  {type:'mcq',q:"Analog signals are:",opts:["Discrete","Digital","Binary","Continuous"],ans:3,exp:"الإجابة: Continuous ✅ — الإشارات التماثلية مستمرة وتأخذ قيماً لا نهائية (كالصوت البشري).",tip:"💡 لو شفت Analog → Continuous (مستمرة). Digital = Discrete."},
+  {type:'mcq',q:"Digital signals are:",opts:["Continuous","Random","Analog","Discrete"],ans:3,exp:"الإجابة: Discrete ✅ — الإشارات الرقمية متقطعة وتأخذ قيمتين فقط (0 أو 1).",tip:"💡 لو شفت Digital signals → Discrete (متقطعة). Analog = Continuous."},
+  {type:'mcq',q:"Hexadecimal system uses:",opts:["10 digits","8 digits","16 digits","2 digits"],ans:2,exp:"الإجابة: 16 digits ✅ — النظام الست عشري يستخدم 16 رمزاً: الأرقام 0-9 والحروف A-F.",tip:"💡 لو شفت Hexadecimal → 16 digits (0-9 + A-F)."},
+  {type:'mcq',q:"1 MB equals:",opts:["1024 KB","1000 KB","512 KB","2048 KB"],ans:0,exp:"الإجابة: 1024 KB ✅ — 1 Megabyte = 1024 Kilobytes = 1,048,576 bytes.",tip:"💡 لو شفت 1 MB → 1024 KB. القاعدة: كل وحدة = 1024 من اللي قبلها."},
+  {type:'mcq',q:"The system board is also called:",opts:["CPU","RAM","Motherboard","ALU"],ans:2,exp:"الإجابة: Motherboard ✅ — لوحة النظام (System Board) هي اللوحة الأم التي تربط جميع مكوّنات الحاسوب.",tip:"💡 لو شفت system board → Motherboard (اللوحة الأم)."},
+  {type:'mcq',q:"Memory is used to:",opts:["Process data","Store data","Display data","Print data"],ans:1,exp:"الإجابة: Store data ✅ — وحدات الذاكرة مُصممة لتخزين البيانات والبرامج."},
+  {type:'mcq',q:"Which is non-volatile?",opts:["RAM","Cache","Register","Flash"],ans:3,exp:"الإجابة: Flash ✅ — Flash memory غير متطايرة. أما RAM وCache والـRegisters فجميعها متطايرة تفقد بياناتها عند إيقاف الجهاز."},
+  {type:'mcq',q:"Binary system uses:",opts:["0–9","0–1","A–F","1–10"],ans:1,exp:"الإجابة: 0–1 ✅ — النظام الثنائي يستخدم رقمين فقط: 0 و1."},
+  {type:'mcq',q:"EBCDIC is used in:",opts:["PCs","Mainframes","Phones","Tablets"],ans:1,exp:"الإجابة: Mainframes ✅ — EBCDIC نظام ترميز من IBM يُستخدم في الحاسبات الكبيرة (Mainframes).",tip:"💡 لو شفت EBCDIC → Mainframe computers (كمبيوترات IBM الكبيرة)."},
+  {type:'mcq',q:"The smallest unit of memory:",opts:["Byte","Bit","KB","MB"],ans:1,exp:"الإجابة: Bit ✅ — الـBit هو أصغر وحدة بيانات. التسلسل: Bit < Byte < KB < MB < GB < TB."},
+
+  // ── PAGE 5-6 TRUE/FALSE ──
+  {type:'tf',q:"The CPU is the brain of the computer.",ans:true,exp:"صح ✅ — المعالج المركزي (CPU) يُعرف بـ'دماغ الحاسوب' لأنه يُنفّذ التعليمات ويتحكم في جميع العمليات."},
+  {type:'tf',q:"The microprocessor is a separate device from the CPU.",ans:false,exp:"خطأ ❌ — الـMicroprocessor هو نفسه الـCPU، مجرد مصطلح آخر للمعالج المركزي المُدمج في دارة متكاملة."},
+  {type:'tf',q:"The ALU performs arithmetic and logical operations.",ans:true,exp:"صح ✅ — ALU تُنفّذ العمليات الحسابية (جمع، طرح، ضرب، قسمة) والمنطقية (AND, OR, NOT, مقارنة)."},
+  {type:'tf',q:"The Control Unit manages data flow in the computer.",ans:true,exp:"صح ✅ — وحدة التحكم تُدير تدفق البيانات وتُوجّه التعليمات بين مكوّنات الحاسوب."},
+  {type:'tf',q:"Cache memory is slower than RAM.",ans:false,exp:"خطأ ❌ — ذاكرة Cache أسرع من RAM وأقرب للمعالج. استخدامها يُقلّل الوقت اللازم للوصول إلى البيانات المتكررة."},
+  {type:'tf',q:"The instruction cycle includes Fetch, Decode, and Execute.",ans:true,exp:"صح ✅ — دورة التعليمات (Machine Cycle) تشمل: Fetch (جلب) → Decode (فك تشفير) → Execute (تنفيذ) → Store (تخزين)."},
+  {type:'tf',q:"Clock speed measures how fast a CPU works.",ans:true,exp:"صح ✅ — سرعة الساعة (Clock Speed) تُقاس بـGHz وتحدد عدد العمليات التي يُنفّذها المعالج في الثانية."},
+  {type:'tf',q:"A word size represents the number of bits processed at one time.",ans:true,exp:"صح ✅ — حجم الكلمة (Word Size) هو عدد الـbits التي يعالجها المعالج دفعة واحدة (مثل 32-bit أو 64-bit)."},
+  {type:'tf',q:"A multicore processor has only one core.",ans:false,exp:"خطأ ❌ — المعالج متعدد النوى (Multicore) يحتوي على نواتين أو أكثر (Dual-core, Quad-core) مما يُحسّن الأداء."},
+  {type:'tf',q:"Parallel processing allows tasks to be divided across cores.",ans:true,exp:"صح ✅ — المعالجة المتوازية (Parallel Processing) توزع المهام على معالجات أو نوى متعددة لتسريع الأداء."},
+  {type:'tf',q:"GPU is used only for text processing.",ans:false,exp:"خطأ ❌ — GPU (وحدة معالجة الرسوميات) مُصمَّمة للرسوميات والحسابات المتوازية، وتُستخدم أيضاً في AI والألعاب وليس النصوص فقط."},
+  {type:'tf',q:"Secondary storage is temporary.",ans:false,exp:"خطأ ❌ — التخزين الثانوي (Secondary Storage) كالقرص الصلب دائم (Non-volatile)، يحتفظ بالبيانات بعد إيقاف الجهاز."},
+  {type:'tf',q:"Writing means saving data to storage.",ans:true,exp:"صح ✅ — الكتابة (Writing) تعني حفظ البيانات على وحدة تخزين، أما القراءة (Reading) فتعني استرجاعها."},
+  {type:'tf',q:"Reading means retrieving data from storage.",ans:true,exp:"صح ✅ — القراءة (Reading) هي عملية استرجاع البيانات المخزّنة من وحدة التخزين."},
+  {type:'tf',q:"Hard disks have no moving parts.",ans:false,exp:"خطأ ❌ — الأقراص الصلبة التقليدية (HDD) تحتوي على أجزاء متحركة (أقراص دوّارة وذراع قراءة). أما SSD فلا أجزاء متحركة فيه."},
+  {type:'tf',q:"SSDs are faster than HDDs.",ans:true,exp:"صح ✅ — SSD (Solid State Drive) أسرع بكثير من HDD لأنه يعتمد على ذاكرة Flash وليس أجزاء ميكانيكية."},
+  {type:'tf',q:"USB flash drives are portable.",ans:true,exp:"صح ✅ — محركات USB Flash صغيرة الحجم وقابلة للحمل، تعتمد على ذاكرة Flash غير المتطايرة."},
+  {type:'tf',q:"CD has larger capacity than DVD.",ans:false,exp:"خطأ ❌ — DVD أكبر سعة من CD. CD ≈ 700MB، DVD ≈ 4.7GB، Blu-ray ≈ 25-50GB."},
+  {type:'tf',q:"Cloud storage uses internet servers.",ans:true,exp:"صح ✅ — التخزين السحابي (Cloud Storage) يعتمد على خوادم عبر الإنترنت. أمثلة: Google Drive, OneDrive, Dropbox."},
+  {type:'tf',q:"Data in cloud storage cannot be accessed from different devices.",ans:false,exp:"خطأ ❌ — ميزة التخزين السحابي الأساسية هي إمكانية الوصول من أي جهاز وأي مكان عبر الإنترنت."},
+
+  // ── PAGE 6 MCQ ──
+  {type:'mcq',q:"CPU stands for:",opts:["Central Process Unit","Computer Processing Unit","Control Processing Unit","Central Processing Unit"],ans:3,exp:"الإجابة: Central Processing Unit ✅ — وحدة المعالجة المركزية هي الاسم الكامل للـCPU."},
+  {type:'mcq',q:"The ALU is responsible for:",opts:["Storage","Control","Calculations","Input"],ans:2,exp:"الإجابة: Calculations ✅ — ALU تُنفّذ العمليات الحسابية والمنطقية في الحاسوب."},
+  {type:'mcq',q:"The Control Unit:",opts:["Performs math","Controls instructions","Stores data","Displays output"],ans:1,exp:"الإجابة: Controls instructions ✅ — وحدة التحكم تُوجّه وتُنفّذ التعليمات وتُنسّق عمل مكوّنات الحاسوب.",tip:"💡 لو شفت Control Unit → Controls operations (يتحكم ويُنسّق)، مش يحسب أو يخزن."},
+  {type:'mcq',q:"Cache memory is:",opts:["Slow","External","Very fast","Permanent"],ans:2,exp:"الإجابة: Very fast ✅ — ذاكرة Cache أسرع أنواع الذاكرة، تقع داخل المعالج أو بجانبه لتسريع الوصول للبيانات المتكررة."},
+  {type:'mcq',q:"The first step of instruction cycle:",opts:["Execute","Decode","Fetch","Store"],ans:2,exp:"الإجابة: Fetch ✅ — دورة التعليمات تبدأ بـFetch (جلب التعليمة من الذاكرة) ثم Decode ثم Execute ثم Store."},
+  {type:'mcq',q:"Clock speed is measured in:",opts:["Cycles per second","Bytes","Seconds","Bits"],ans:0,exp:"الإجابة: Cycles per second ✅ — سرعة الساعة تُقاس بالدورات في الثانية (Hz أو GHz)، تحدد سرعة المعالج."},
+  {type:'mcq',q:"Word size can be:",opts:["2 or 4 bits","8 only","16, 32, 64 bits","128 only"],ans:2,exp:"الإجابة: 16, 32, 64 bits ✅ — أحجام الكلمة الشائعة هي 16 أو 32 أو 64 bit. المعالجات الحديثة 64-bit."},
+  {type:'mcq',q:"Multicore processor means:",opts:["One CPU","Multiple CPUs in one chip","No CPU","External CPU"],ans:1,exp:"الإجابة: Multiple CPUs in one chip ✅ — معالج متعدد النوى يحتوي على نواتين أو أكثر في شريحة واحدة."},
+  {type:'mcq',q:"GPU is used for:",opts:["Graphics processing","Storage","Input","Printing"],ans:0,exp:"الإجابة: Graphics processing ✅ — GPU مُصمَّم لمعالجة الرسوميات والحسابات المتوازية في الألعاب والذكاء الاصطناعي."},
+  {type:'mcq',q:"Secondary storage is used for:",opts:["Temporary storage","Permanent storage","Processing","Input"],ans:1,exp:"الإجابة: Permanent storage ✅ — التخزين الثانوي (HDD, SSD, USB) للتخزين الدائم طويل الأمد."},
+  {type:'mcq',q:"Writing means:",opts:["Reading data","Deleting data","Saving data","Displaying data"],ans:2,exp:"الإجابة: Saving data ✅ — الكتابة (Writing) هي حفظ البيانات على وحدة التخزين."},
+  {type:'mcq',q:"Reading means:",opts:["Saving","Formatting","Deleting","Retrieving"],ans:3,exp:"الإجابة: Retrieving ✅ — القراءة (Reading) هي استرجاع البيانات من وحدة التخزين."},
+  {type:'mcq',q:"HDD uses:",opts:["No moving parts","Magnetic disks","Light","RAM"],ans:1,exp:"الإجابة: Magnetic disks ✅ — القرص الصلب التقليدي يعتمد على أقراص مغناطيسية دوّارة لتخزين البيانات."},
+  {type:'mcq',q:"SSD is:",opts:["Slower than HDD","Has moving parts","Faster and durable","External only"],ans:2,exp:"الإجابة: Faster and durable ✅ — SSD أسرع من HDD وأكثر متانة لأنه يعتمد على ذاكرة Flash بدون أجزاء متحركة."},
+  {type:'mcq',q:"USB drives connect through:",opts:["HDMI","USB port","VGA","LAN"],ans:1,exp:"الإجابة: USB port ✅ — محركات USB تتصل عبر منفذ USB. HDMI وVGA لشاشات العرض، وLAN للشبكة."},
+  {type:'mcq',q:"CD capacity is about:",opts:["700 MB","4.7 GB","50 GB","1 TB"],ans:0,exp:"الإجابة: 700 MB ✅ — سعة CD ≈ 700MB، DVD ≈ 4.7GB، Blu-ray ≈ 25-50GB."},
+  {type:'mcq',q:"DVD capacity is about:",opts:["700 MB","4.7 GB","50 GB","10 GB"],ans:1,exp:"الإجابة: 4.7 GB ✅ — السعة القياسية لـDVD أحادي الطبقة هي 4.7 جيجابايت."},
+  {type:'mcq',q:"Blu-ray capacity is about:",opts:["700 MB","4.7 GB","50 GB","100 MB"],ans:2,exp:"الإجابة: 50 GB ✅ — Blu-ray ثنائي الطبقة يصل إلى 50GB. أحادي الطبقة 25GB."},
+  {type:'mcq',q:"Cloud storage depends on:",opts:["RAM","CPU","Internet","Keyboard"],ans:2,exp:"الإجابة: Internet ✅ — التخزين السحابي يعتمد على الإنترنت للوصول إلى خوادم بعيدة."},
+  {type:'mcq',q:"Example of cloud storage:",opts:["RAM","Google Drive","CPU","ALU"],ans:1,exp:"الإجابة: Google Drive ✅ — Google Drive خدمة تخزين سحابي. أما RAM وCPU وALU فمكوّنات داخلية في الحاسوب."},
+
+  // ── PAGE 6-7 TRUE/FALSE ──
+  {type:'tf',q:"A computer processes data into useful information.",ans:true,exp:"صح ✅ — الحاسوب يأخذ البيانات الخام (Data) ويعالجها لإنتاج معلومات مفيدة (Information)."},
+  {type:'tf',q:"Software performs operations instead of hardware.",ans:false,exp:"خطأ ❌ — الـHardware هو الذي يُنفّذ العمليات الفعلية. الـSoftware مجرد تعليمات تُوجّه الـHardware."},
+  {type:'tf',q:"CPU executes instructions.",ans:true,exp:"صح ✅ — المعالج المركزي هو الجزء المسؤول عن تنفيذ التعليمات البرمجية."},
+  {type:'tf',q:"RAM is a type of permanent memory.",ans:false,exp:"خطأ ❌ — RAM مؤقتة (Volatile) تفقد بياناتها عند إيقاف الجهاز. الدائمة هي ROM وHDD وFlash.",tip:"💡 لو شفت RAM + permanent → False، RAM مؤقتة (Volatile) تُمسح عند إيقاف الجهاز."},
+  {type:'tf',q:"ROM can be written and modified easily.",ans:false,exp:"خطأ ❌ — ROM (Read-Only Memory) للقراءة فقط ولا يمكن تعديلها بسهولة في الظروف العادية."},
+  {type:'tf',q:"Input devices send data into the computer.",ans:true,exp:"صح ✅ — أجهزة الإدخال (لوحة المفاتيح، الفأرة، الميكروفون) تُرسل البيانات إلى الحاسوب للمعالجة."},
+  {type:'tf',q:"Output devices display processed data.",ans:true,exp:"صح ✅ — أجهزة الإخراج (الشاشة، الطابعة، السماعات) تعرض نتائج معالجة البيانات للمستخدم."},
+  {type:'tf',q:"Hard disk is a type of secondary storage.",ans:true,exp:"صح ✅ — القرص الصلب (HDD/SSD) نوع من التخزين الثانوي الدائم المستخدم لحفظ البيانات طويل الأمد."},
+  {type:'tf',q:"Primary storage is non-volatile.",ans:false,exp:"خطأ ❌ — التخزين الأولي (RAM) متطاير (Volatile). غير المتطايرة هي التخزين الثانوي (HDD, SSD, Flash)."},
+  {type:'tf',q:"Secondary storage is long-term storage.",ans:true,exp:"صح ✅ — التخزين الثانوي (HDD, SSD, USB, CD) للتخزين الدائم طويل الأمد."},
+  {type:'tf',q:"A disk drive reads and writes data.",ans:true,exp:"صح ✅ — محرك الأقراص يستطيع قراءة البيانات (Reading) وكتابتها (Writing) على وسيط التخزين."},
+  {type:'tf',q:"CD-ROM allows writing data.",ans:false,exp:"خطأ ❌ — CD-ROM للقراءة فقط (ROM = Read-Only Memory). القابل للكتابة يُسمى CD-R أو CD-RW."},
+  {type:'tf',q:"DVD has larger capacity than CD.",ans:true,exp:"صح ✅ — DVD (≈4.7GB) أكبر سعة بكثير من CD (≈700MB)."},
+  {type:'tf',q:"A network connects computers and resources.",ans:true,exp:"صح ✅ — الشبكة تربط الحاسبات والموارد (طابعات، ملفات) لتمكين المشاركة والتواصل."},
+  {type:'tf',q:"LAN connects computers over very large distances.",ans:false,exp:"خطأ ❌ — LAN (Local Area Network) تربط حاسبات في منطقة محدودة (مبنى أو مكتب). الشبكة على مسافات كبيرة هي WAN."},
+  {type:'tf',q:"WAN connects computers over large distances.",ans:true,exp:"صح ✅ — WAN (Wide Area Network) تربط شبكات عبر مسافات جغرافية كبيرة. الإنترنت هو أكبر مثال على WAN."},
+  {type:'tf',q:"Internet is a collection of networks.",ans:true,exp:"صح ✅ — الإنترنت شبكة الشبكات (Network of Networks)، تربط ملايين الشبكات المختلفة حول العالم."},
+  {type:'tf',q:"TCP/IP is used for communication on the internet.",ans:true,exp:"صح ✅ — TCP/IP مجموعة بروتوكولات تُحدد كيفية إرسال واستقبال البيانات عبر الإنترنت."},
+  {type:'tf',q:"ISP provides internet access.",ans:true,exp:"صح ✅ — مزود خدمة الإنترنت (ISP) هو الجهة التي تُتيح للمستخدمين الاتصال بالإنترنت."},
+  {type:'tf',q:"Servers cannot provide services to other computers.",ans:false,exp:"خطأ ❌ — الخوادم (Servers) مُصمَّمة خصيصاً لتقديم الخدمات للحاسبات الأخرى (العملاء) على الشبكة."},
+
+  // ── PAGE 7 MCQ ──
+  {type:'mcq',q:"A computer is a machine that:",opts:["Only stores data","Only displays data","Only inputs data","Processes data into information"],ans:3,exp:"الإجابة: Processes data into information ✅ — الحاسوب يأخذ البيانات الخام ويعالجها لإنتاج معلومات مفيدة."},
+  {type:'mcq',q:"CPU is responsible for:",opts:["Processing","Input","Output","Storage"],ans:0,exp:"الإجابة: Processing ✅ — المعالج المركزي مسؤول عن معالجة وتنفيذ التعليمات والبيانات."},
+  {type:'mcq',q:"RAM is:",opts:["Permanent","Temporary","Optical","External"],ans:1,exp:"الإجابة: Temporary ✅ — RAM مؤقتة تفقد محتواها عند إيقاف الجهاز.",tip:"💡 لو شفت RAM → Volatile (مؤقتة تُمسح عند الإيقاف)."},
+  {type:'mcq',q:"ROM stands for:",opts:["Read Only Memory","Random Only Memory","Run Only Memory","Read Open Memory"],ans:0,exp:"الإجابة: Read Only Memory ✅ — ذاكرة القراءة فقط، تحتوي على بيانات ثابتة لا تُمحى عند إيقاف الجهاز."},
+  {type:'mcq',q:"Input device example:",opts:["Printer","Monitor","Keyboard","Speaker"],ans:2,exp:"الإجابة: Keyboard ✅ — لوحة المفاتيح جهاز إدخال. أما Printer وMonitor وSpeaker فأجهزة إخراج."},
+  {type:'mcq',q:"Output device example:",opts:["Mouse","Keyboard","Scanner","Monitor"],ans:3,exp:"الإجابة: Monitor ✅ — الشاشة جهاز إخراج تعرض المعلومات للمستخدم. Mouse وKeyboard وScanner أجهزة إدخال."},
+  {type:'mcq',q:"HDD is used for:",opts:["Temporary storage","Permanent storage","Processing","Input"],ans:1,exp:"الإجابة: Permanent storage ✅ — القرص الصلب للتخزين الدائم طويل الأمد للبيانات والبرامج."},
+  {type:'mcq',q:"CD-ROM capacity is smaller than:",opts:["DVD","USB","RAM","Cache"],ans:0,exp:"الإجابة: DVD ✅ — CD ≈700MB وهي أصغر من DVD ≈4.7GB."},
+  {type:'mcq',q:"Primary storage is:",opts:["Permanent","Temporary","External","Optical"],ans:1,exp:"الإجابة: Temporary ✅ — التخزين الأولي (RAM) مؤقت ومتطاير."},
+  {type:'mcq',q:"Secondary storage is:",opts:["Temporary","Volatile","Internal only","Long-term"],ans:3,exp:"الإجابة: Long-term ✅ — التخزين الثانوي دائم وطويل الأمد."},
+  {type:'mcq',q:"LAN connects:",opts:["Local area","Worldwide","Countries","Continents"],ans:0,exp:"الإجابة: Local area ✅ — LAN شبكة محلية تربط أجهزة في منطقة محدودة كمبنى أو مكتب."},
+  {type:'mcq',q:"MAN connects:",opts:["Same building","Same city","Whole world","Single device"],ans:1,exp:"الإجابة: Same city ✅ — MAN (Metropolitan Area Network) شبكة تربط أجهزة في مدينة واحدة."},
+  {type:'mcq',q:"WAN connects:",opts:["Small area","Large distances","One computer","One room"],ans:1,exp:"الإجابة: Large distances ✅ — WAN (Wide Area Network) تربط شبكات عبر مسافات جغرافية كبيرة."},
+  {type:'mcq',q:"Internet is:",opts:["Single network","Collection of networks","Device","Software"],ans:1,exp:"الإجابة: Collection of networks ✅ — الإنترنت مجموعة من الشبكات المترابطة حول العالم."},
+  {type:'mcq',q:"TCP/IP is used for:",opts:["Storage","Communication","Input","Output"],ans:1,exp:"الإجابة: Communication ✅ — TCP/IP بروتوكولات الاتصال الأساسية على الإنترنت."},
+  {type:'mcq',q:"ISP stands for:",opts:["Internet Service Provider","Internal System Processor","Input Service Program","Internet System Protocol"],ans:0,exp:"الإجابة: Internet Service Provider ✅ — مزود خدمة الإنترنت، الشركة التي تُتيح الاتصال بالإنترنت.",tip:"💡 لو شفت ISP → Internet Service Provider، الشركة اللي بتوفر الإنترنت."},
+  {type:'mcq',q:"FTP is used for:",opts:["Email","File transfer","Chat","Browsing"],ans:1,exp:"الإجابة: File transfer ✅ — FTP (File Transfer Protocol) بروتوكول نقل الملفات بين الأجهزة عبر الشبكة."},
+  {type:'mcq',q:"WWW stands for:",opts:["World Wide Web","Wide Web World","Web World Wide","World Wide World Web Wide"],ans:0,exp:"الإجابة: World Wide Web ✅ — الشبكة العنكبوتية العالمية، نظام المعلومات المبني على الإنترنت."},
+  {type:'mcq',q:"Server is:",opts:["Input device","Output device","Service provider computer","Storage only"],ans:2,exp:"الإجابة: Service provider computer ✅ — الخادم (Server) حاسوب يُقدّم خدمات وموارد للأجهزة الأخرى (العملاء) على الشبكة."},
+  {type:'mcq',q:"Supercomputer is:",opts:["Small computer","Low performance","Very powerful computer","Portable device"],ans:2,exp:"الإجابة: Very powerful computer ✅ — Supercomputer الأقوى في الأداء، يُستخدم في الأبحاث العلمية وتحليل البيانات الضخمة."},
+
+  // ── PAGE 8 TRUE/FALSE ──
+  {type:'tf',q:"The CPU consists of two main parts: the Control Unit and the ALU.",ans:true,exp:"صح ✅ — المعالج المركزي مُكوَّن أساساً من وحدة التحكم (Control Unit) ووحدة الحساب والمنطق (ALU)."},
+  {type:'tf',q:"The CPU can process data directly from a disk without moving it to memory.",ans:false,exp:"خطأ ❌ — يجب نقل البيانات إلى RAM أولاً قبل أن يتمكن المعالج من معالجتها. لا يستطيع المعالج الوصول مباشرة للقرص."},
+  {type:'tf',q:"Registers are high-speed temporary storage areas located within the CPU.",ans:true,exp:"صح ✅ — السجلات (Registers) وحدات تخزين مؤقتة فائقة السرعة موجودة داخل المعالج نفسه لتخزين البيانات أثناء المعالجة."},
+  {type:'tf',q:"The Instruction Time (I-time) is the time it takes the ALU to execute an instruction.",ans:false,exp:"خطأ ❌ — I-time هو وقت جلب وفك تشفير التعليمة (Fetch + Decode). أما وقت التنفيذ فيُسمى E-time (Execution Time)."},
+  {type:'tf',q:"A Kilobyte is exactly 1000 bytes.",ans:false,exp:"خطأ ❌ — 1 Kilobyte = 1024 bytes (2^10). الحاسوب يعتمد النظام الثنائي وليس العشري."},
+  {type:'tf',q:"The system clock synchronizes the operations of the computer.",ans:true,exp:"صح ✅ — ساعة النظام (System Clock) تُزامن جميع عمليات الحاسوب وتحدد سرعة المعالج."},
+  {type:'tf',q:"ASCII is the most widely used coding scheme on personal computers.",ans:true,exp:"صح ✅ — ASCII هو نظام الترميز الأكثر استخداماً في الحاسبات الشخصية لتمثيل النصوص الإنجليزية."},
+  {type:'tf',q:"RAM is non-volatile, meaning it keeps its data when the power is turned off.",ans:false,exp:"خطأ ❌ — RAM متطايرة (Volatile) تفقد بياناتها عند إيقاف الجهاز. غير المتطايرة هي ROM وFlash وHDD."},
+  {type:'tf',q:"RISC technology uses a small subset of instructions to increase speed.",ans:true,exp:"صح ✅ — RISC (Reduced Instruction Set Computing) تستخدم مجموعة صغيرة من التعليمات البسيطة لتحقيق سرعة أعلى."},
+  {type:'tf',q:"Pipelining is the process of using multiple processors at once to solve a problem.",ans:false,exp:"خطأ ❌ — Pipelining تقنية تُغذّي تعليمة جديدة في كل مرحلة من دورة المعالج قبل انتهاء السابقة. المعالجة المتوازية هي استخدام معالجات متعددة."},
+  {type:'tf',q:"Unicode was designed to accommodate alphabets with more than 256 characters.",ans:true,exp:"صح ✅ — Unicode صُمِّم لتجاوز قيود ASCII (128 حرف) ودعم لغات العالم التي تحتوي على أكثر من 256 رمز."},
+  {type:'tf',q:"The motherboard is the circuit board that holds the CPU and other electronic components.",ans:true,exp:"صح ✅ — اللوحة الأم (Motherboard) هي الدارة الرئيسية التي تحمل المعالج والذاكرة وبطاقات التوسعة وتربطها معاً."},
+  {type:'tf',q:"Cache Level 1 (L1) is usually faster and more expensive than Level 2 (L2) cache.",ans:true,exp:"صح ✅ — L1 Cache الأسرع والأصغر والأغلى، موجودة داخل المعالج مباشرة. L2 أكبر وأبطأ قليلاً."},
+  {type:'tf',q:"Control Unit is responsible for executing arithmetic operations like addition and subtraction.",ans:false,exp:"خطأ ❌ — العمليات الحسابية (جمع، طرح) مهمة ALU. وحدة التحكم تُوجّه وتُنسّق التعليمات فقط."},
+  {type:'tf',q:"Binary system uses only two digits: 0 and 1.",ans:true,exp:"صح ✅ — النظام الثنائي (Binary) يستخدم رقمين فقط: 0 و1، وهو الأساس الذي تعمل به الحاسبات."},
+  {type:'tf',q:"MIPS stands for Millions of Instructions Per Second.",ans:true,exp:"صح ✅ — MIPS مقياس لأداء المعالج يُعبّر عن عدد الملايين من التعليمات التي يُنفّذها في الثانية."},
+  {type:'tf',q:"A Megabyte is roughly one billion bytes.",ans:false,exp:"خطأ ❌ — 1 Megabyte ≈ مليون byte (1,048,576 bytes). المليار byte هو Gigabyte تقريباً."},
+  {type:'tf',q:"The Control Unit decodes instructions during the machine cycle.",ans:true,exp:"صح ✅ — في دورة التعليمات، وحدة التحكم تجلب التعليمة (Fetch) ثم تفك شفرتها (Decode) لتحديد العملية المطلوبة."},
+  {type:'tf',q:"ROM stands for Random Only Memory.",ans:false,exp:"خطأ ❌ — ROM تعني Read-Only Memory (ذاكرة القراءة فقط). Random Access Memory هي RAM."},
+  {type:'tf',q:"Parallel processing involves a control processor dividing a problem into parts.",ans:true,exp:"صح ✅ — المعالجة المتوازية تعتمد على معالج تحكم يُقسّم المشكلة إلى أجزاء تُعالَج في آنٍ واحد بمعالجات متعددة."},
+  {type:'tf',q:"The system bus speed is typically measured in Megahertz (MHz).",ans:true,exp:"صح ✅ — سرعة ناقل النظام (System Bus) تُقاس بـMHz، وتؤثر على سرعة نقل البيانات بين المعالج والذاكرة."},
+  {type:'tf',q:"CISC stands for Complex Instruction Set Computing.",ans:true,exp:"صح ✅ — CISC نهج تصميم معالج يستخدم مجموعة كبيرة من التعليمات المعقدة. معظم معالجات Intel وAMD تعتمده."},
+  {type:'tf',q:"The Store step in the machine cycle saves results back into the RAM.",ans:true,exp:"صح ✅ — مرحلة Store (التخزين) في دورة التعليمات تحفظ نتائج العمليات مجدداً في الذاكرة (RAM)."},
+  {type:'tf',q:"Secondary storage is used for long-term storage and is not lost when power is off.",ans:true,exp:"صح ✅ — التخزين الثانوي (HDD, SSD, Flash) غير متطاير، يحتفظ بالبيانات حتى بعد إيقاف الجهاز."},
+  {type:'tf',q:"Each memory location has a unique address referred to by a number.",ans:true,exp:"صح ✅ — كل خلية ذاكرة لها عنوان فريد (Memory Address) يستخدمه المعالج للوصول المباشر لها."},
+
+  // ── PAGE 8 MCQ ──
+  {type:'mcq',q:"Which unit directs the computer system to execute stored program instructions?",opts:["ALU","Control Unit","RAM","ROM"],ans:1,exp:"الإجابة: Control Unit ✅ — وحدة التحكم تُوجّه الحاسوب لتنفيذ التعليمات المخزّنة وتُنسّق بين مكوّناته."},
+  {type:'mcq',q:"Which of the following is an arithmetic operation?",opts:["Equal-to","Less-than","Multiplication","Greater-than"],ans:2,exp:"الإجابة: Multiplication ✅ — الضرب عملية حسابية. أما Equal-to وLess-than وGreater-than فعمليات منطقية مقارنة."},
+  {type:'mcq',q:"High-speed temporary storage areas within the CPU are called:",opts:["Hard drives","RAM","Buses","Registers"],ans:3,exp:"الإجابة: Registers ✅ — السجلات وحدات تخزين مؤقتة فائقة السرعة داخل المعالج لتخزين البيانات أثناء المعالجة."},
+  {type:'mcq',q:"The time required to fetch, decode, execute, and store an operation is called:",opts:["Clock speed","Machine cycle","Bus speed","Access time"],ans:1,exp:"الإجابة: Machine cycle ✅ — دورة الآلة (Machine Cycle) هي الوقت اللازم لإكمال دورة كاملة: Fetch→Decode→Execute→Store."},
+  {type:'mcq',q:"Which coding scheme uses 16 bits and can represent 65,536 possible values?",opts:["ASCII","EBCDIC","Unicode","Binary"],ans:2,exp:"الإجابة: Unicode ✅ — Unicode يستخدم 16 bit مما يتيح تمثيل 2^16 = 65,536 رمزاً مختلفاً."},
+  {type:'mcq',q:"Roughly one trillion bytes is a:",opts:["Gigabyte","Terabyte","Megabyte","Kilobyte"],ans:1,exp:"الإجابة: Terabyte ✅ — 1 Terabyte ≈ تريليون byte (1,099,511,627,776 byte بالضبط)."},
+  {type:'mcq',q:"Which processor technology requires complex operations to be broken into smaller steps?",opts:["CISC","Parallel","Pipelining","RISC"],ans:3,exp:"الإجابة: RISC ✅ — RISC يُفكّك العمليات المعقدة إلى تعليمات بسيطة صغيرة لزيادة السرعة."},
+  {type:'mcq',q:"The internal cache built directly into the microprocessor is:",opts:["Level 1","Level 2","Level 3","RAM"],ans:0,exp:"الإجابة: Level 1 ✅ — L1 Cache مدمجة مباشرة في المعالج، الأسرع والأصغر والأغلى."},
+  {type:'mcq',q:"The physical electrical paths that transport data between the CPU and memory are the:",opts:["Registers","Pipelining","Ports","System Bus"],ans:3,exp:"الإجابة: System Bus ✅ — ناقل النظام هو المسارات الكهربائية التي تنقل البيانات بين المعالج والذاكرة والمكوّنات الأخرى."},
+  {type:'mcq',q:"The ALU tests for which of the following logical conditions?",opts:["Equal-to","Addition","Storage size","Clock speed"],ans:0,exp:"الإجابة: Equal-to ✅ — ALU تُنفّذ اختبارات منطقية كـEqual-to وLess-than وGreater-than إضافة للعمليات الحسابية."},
+  {type:'mcq',q:"Which step of the machine cycle involves saving the result in RAM?",opts:["Fetch","Decode","Execute","Store"],ans:3,exp:"الإجابة: Store ✅ — مرحلة Store هي آخر خطوة في دورة الآلة، تحفظ نتيجة العملية في الذاكرة."},
+  {type:'mcq',q:"Microprocessor speeds are usually expressed today in:",opts:["MHz","GHz","MIPS","Teraflops"],ans:1,exp:"الإجابة: GHz ✅ — سرعة المعالجات الحديثة تُقاس بـGHz (جيجاهرتز). مثلاً: 3.5 GHz."},
+  {type:'mcq',q:"Which type of memory must be continuously refreshed by the CPU?",opts:["SRAM","ROM","PROM","DRAM"],ans:3,exp:"الإجابة: DRAM ✅ — الذاكرة الديناميكية العشوائية (DRAM) تحتاج إلى تحديث مستمر (Refresh) لإعادة شحن خلاياها."},
+  {type:'mcq',q:"A variation of traditional serial processing that feeds a new instruction at each step is:",opts:["Parallel processing","Multi-tasking","Pipelining","RISC"],ans:2,exp:"الإجابة: Pipelining ✅ — تقنية Pipelining تُغذّي تعليمة جديدة في كل مرحلة من مراحل المعالج قبل انتهاء السابقة."},
+  {type:'mcq',q:"Which component is the most important on the motherboard?",opts:["Power supply","CPU (Microprocessor)","Expansion slots","Ports"],ans:1,exp:"الإجابة: CPU (Microprocessor) ✅ — المعالج هو أهم مكوّن على اللوحة الأم لأنه يُنفّذ جميع التعليمات."},
+  {type:'mcq',q:"How many bits are in one byte?",opts:["4","8","16","32"],ans:1,exp:"الإجابة: 8 ✅ — 1 Byte = 8 bits. هذا المعيار الأساسي في علم الحاسوب."},
+  {type:'mcq',q:"Which memory chip contains programs permanently recorded at the factory?",opts:["RAM","Hard Disk","DVD","ROM"],ans:3,exp:"الإجابة: ROM ✅ — ROM تحتوي على برامج مُخزَّنة بشكل دائم منذ التصنيع (مثل BIOS)."},
+  {type:'mcq',q:"Instruction time (I-time) includes which steps?",opts:["Decode and Store","Execute and Store","Fetch and Execute","Fetch and Decode"],ans:3,exp:"الإجابة: Fetch and Decode ✅ — I-time (Instruction Time) يشمل مرحلتَي Fetch وDecode. أما Execute وStore فيُشكّلان E-time."},
+  {type:'mcq',q:"What measures the ability of a computer to perform complex mathematical operations?",opts:["MIPS","Megaflop","Bus width","GHz"],ans:1,exp:"الإجابة: Megaflop ✅ — Megaflop (MFLOPS) يقيس قدرة الحاسوب على إجراء عمليات الفاصلة العائمة المعقدة."},
+  {type:'mcq',q:"Parallel processing is often measured in:",opts:["Megabytes","Milliseconds","Volts","Teraflops"],ans:3,exp:"الإجابة: Teraflops ✅ — الـSupercomputers والمعالجة المتوازية تُقاس بـTeraflops (تريليون عملية فاصلة عائمة في الثانية)."},
+  {type:'mcq',q:"Expansion boards connect to the motherboard via:",opts:["Registers","ALU","Expansion slots","Cache"],ans:2,exp:"الإجابة: Expansion slots ✅ — بطاقات التوسعة (GPU, Sound card) تتصل باللوحة الأم عبر فتحات التوسعة (PCIe slots)."},
+  {type:'mcq',q:"Which type of RAM is faster and used today?",opts:["DRAM","SDRAM","PROM","EBCDIC"],ans:1,exp:"الإجابة: SDRAM ✅ — SDRAM (Synchronous DRAM) أسرع من DRAM التقليدية لأنها مُزامَنة مع ساعة النظام."},
+  {type:'mcq',q:"When data is written back to a memory address, what happens to previous contents?",opts:["Added to existing data","The address is changed","Sent to the ALU","The previous contents are destroyed"],ans:3,exp:"الإجابة: The previous contents are destroyed ✅ — عند الكتابة في عنوان ذاكرة، تُستبدل البيانات القديمة بالجديدة وتُفقد تلقائياً."},
+  {type:'mcq',q:"The number of electrical paths to carry data is called:",opts:["Bus speed","Bus width","Bus length","Bus port"],ans:1,exp:"الإجابة: Bus width ✅ — عرض الناقل (Bus Width) هو عدد المسارات الكهربائية المتوازية لنقل البيانات، يُحدد كمية البيانات المنقولة دفعة واحدة."},
+
+  // ── PAGE 9-10 TRUE/FALSE ──
+  {type:'tf',q:"A computer program is a set of instructions that a computer can execute.",ans:true,exp:"صح ✅ — البرنامج مجموعة تعليمات مكتوبة بلغة برمجية يُنفّذها الحاسوب لإنجاز مهمة معينة."},
+  {type:'tf',q:"Software is the physical part of the computer system.",ans:false,exp:"خطأ ❌ — البرمجيات (Software) هي الجزء غير المادي (التعليمات والبرامج). الجزء المادي هو الـHardware."},
+  {type:'tf',q:"An algorithm must be written in a specific programming language.",ans:false,exp:"خطأ ❌ — الخوارزمية مستقلة عن أي لغة برمجية، يمكن التعبير عنها بالكلام العادي أو Pseudocode أو مخطط انسيابي."},
+  {type:'tf',q:"The Design phase in the Software Life Cycle involves coding the program.",ans:false,exp:"خطأ ❌ — مرحلة التصميم (Design) تشمل وضع الخوارزميات والمخططات الانسيابية. الكتابة الفعلية للكود تكون في مرحلة Coding."},
+  {type:'tf',q:"Machine language is the only language that a computer can understand directly.",ans:true,exp:"صح ✅ — لغة الآلة (0 و1) هي اللغة الوحيدة التي يفهمها المعالج مباشرة دون الحاجة لمترجم."},
+  {type:'tf',q:"Assembly language uses binary codes (0s and 1s) for instructions.",ans:false,exp:"خطأ ❌ — لغة التجميع تستخدم رموزاً مختصرة (Mnemonics) كـMOV وADD. أما 0 و1 فهي لغة الآلة."},
+  {type:'tf',q:"High-level languages are easier for humans to read and write than low-level languages.",ans:true,exp:"صح ✅ — اللغات عالية المستوى كـPython وJava أقرب للغة البشرية وأسهل في القراءة والكتابة والصيانة."},
+  {type:'tf',q:"A Compiler translates the entire program into machine code at once.",ans:true,exp:"صح ✅ — المترجم (Compiler) يُترجم البرنامج كاملاً دفعة واحدة إلى لغة الآلة. بعكس Interpreter الذي يُترجم سطراً بسطر."},
+  {type:'tf',q:"In a flowchart, a rectangle symbol represents a decision point.",ans:false,exp:"خطأ ❌ — المستطيل في المخطط الانسيابي يُمثّل عملية (Process). نقطة القرار تُمثَّل بالمعيّن (Diamond)."},
+  {type:'tf',q:"Pseudocode is a formal programming language with strict syntax rules.",ans:false,exp:"خطأ ❌ — Pseudocode شبه كود غير رسمي يُستخدم لوصف الخوارزمية بلغة شبه إنسانية دون قواعد صارمة."},
+  {type:'tf',q:"The main() function is the entry point of every C++ program.",ans:true,exp:"صح ✅ — main() هي نقطة الدخول الإلزامية لكل برنامج C++، منها يبدأ التنفيذ."},
+  {type:'tf',q:"The #include directive is used for input and output operations.",ans:false,exp:"خطأ ❌ — #include توجيه يُدرج ملف مكتبة. العمليات الفعلية للإدخال والإخراج تُنفَّذ بدوال كـcin وcout من مكتبة <iostream>."},
+  {type:'tf',q:"In C++, the semicolon (;) is used to mark the end of a statement.",ans:true,exp:"صح ✅ — الفاصلة المنقوطة (;) إلزامية في نهاية كل جملة في C++، وإغفالها يُسبّب Syntax Error."},
+  {type:'tf',q:"Variable names in C++ can start with a number.",ans:false,exp:"خطأ ❌ — أسماء المتغيرات يجب أن تبدأ بحرف أو (_). البدء برقم يُسبّب خطأ في الصياغة."},
+  {type:'tf',q:"The keyword 'const' defines a variable whose value cannot be changed.",ans:true,exp:"صح ✅ — const يُعرّف ثابتاً (Constant)، قيمته ثابتة لا تتغير طوال البرنامج. مثل: const int MAX = 100;"},
+  {type:'tf',q:"Logic errors cause a program to crash during execution.",ans:false,exp:"خطأ ❌ — أخطاء المنطق (Logic Errors) لا تُوقف البرنامج لكنها تُنتج نتائج خاطئة. الأخطاء التي تُوقف البرنامج هي Runtime Errors."},
+  {type:'tf',q:"A flowchart Parallelogram is used for Input/Output operations.",ans:true,exp:"صح ✅ — شكل متوازي الأضلاع (Parallelogram) في المخطط الانسيابي يُمثّل عمليات الإدخال والإخراج."},
+  {type:'tf',q:"The Testing phase ensures the program meets the specified requirements.",ans:true,exp:"صح ✅ — مرحلة الاختبار (Testing) تتحقق من أن البرنامج يعمل بشكل صحيح ويُلبّي متطلبات المستخدم."},
+  {type:'tf',q:"Low-level languages are machine-dependent.",ans:true,exp:"صح ✅ — اللغات المنخفضة المستوى (لغة الآلة والتجميع) مرتبطة بنوع المعالج ولا تعمل على أجهزة أخرى دون تعديل."},
+  {type:'tf',q:"Compiling a C++ program creates an executable (.exe) file.",ans:true,exp:"صح ✅ — عملية الترجمة الكاملة (Compile + Link) تُنتج ملفاً تنفيذياً (.exe على Windows) يمكن تشغيله مباشرة."},
+  {type:'tf',q:"Integer (int) data type is used for storing decimal numbers.",ans:false,exp:"خطأ ❌ — int للأعداد الصحيحة (بدون فاصلة). للأعداد العشرية نستخدم float أو double."},
+  {type:'tf',q:"The Software Life Cycle starts with the Problem Definition phase.",ans:true,exp:"صح ✅ — دورة حياة البرمجيات تبدأ بتحديد المشكلة (Problem Definition) ثم التحليل فالتصميم فالبرمجة فالاختبار فالصيانة."},
+  {type:'tf',q:"'Cin' is used to output data to the screen in C++.",ans:false,exp:"خطأ ❌ — cin للإدخال (Input). الإخراج إلى الشاشة يكون بـcout. مثال: cout << \"Hello\";"},
+  {type:'tf',q:"Maintenance is the final phase of the Software Life Cycle.",ans:true,exp:"صح ✅ — الصيانة (Maintenance) هي آخر مرحلة في دورة حياة البرمجيات، تشمل تصحيح الأخطاء وإضافة ميزات جديدة."},
+  {type:'tf',q:"Assemblers are used to translate High-Level languages.",ans:false,exp:"خطأ ❌ — Assembler يُترجم لغة التجميع (Assembly Language) فقط. اللغات عالية المستوى تحتاج Compiler أو Interpreter."},
+
+  // ── PAGE 10 MCQ ──
+  {type:'mcq',q:"What is the first phase of the Software Life Cycle?",opts:["Design","Problem Definition","Coding","Testing"],ans:1,exp:"الإجابة: Problem Definition ✅ — أولى مراحل دورة حياة البرمجيات هي تحديد وفهم المشكلة المراد حلها."},
+  {type:'mcq',q:"Which of the following is a characteristic of an algorithm?",opts:["It must be written in C++","It is a finite set of steps","It must use a compiler","It is hardware-dependent"],ans:1,exp:"الإجابة: It is a finite set of steps ✅ — الخوارزمية مجموعة محدودة من الخطوات المنطقية، مستقلة عن اللغة أو الجهاز."},
+  {type:'mcq',q:"Which language generation is known as Machine Language?",opts:["1GL","2GL","3GL","4GL"],ans:0,exp:"الإجابة: 1GL ✅ — الجيل الأول (1GL) هو لغة الآلة (Binary). 2GL=Assembly, 3GL=High-level, 4GL=Non-procedural."},
+  {type:'mcq',q:"The diamond shape in a flowchart represents:",opts:["Process","Start/End","Decision","Input/Output"],ans:2,exp:"الإجابة: Decision ✅ — المعيّن (Diamond) يُمثّل نقطة قرار (If/Else). المستطيل=عملية، البيضاوي=بداية/نهاية، متوازي الأضلاع=إدخال/إخراج."},
+  {type:'mcq',q:"Which translator converts code line-by-line during execution?",opts:["Compiler","Assembler","Linker","Interpreter"],ans:3,exp:"الإجابة: Interpreter ✅ — المُفسِّر يُترجم البرنامج سطراً بسطر أثناء التنفيذ. بعكس Compiler الذي يُترجم الكل دفعة واحدة."},
+  {type:'mcq',q:"In C++, which symbol is used for single-line comments?",opts:["/*","//","#","--"],ans:1,exp:"الإجابة: // ✅ — // للتعليق على سطر واحد في C++. أما /* */ فللتعليقات متعددة الأسطر."},
+  {type:'mcq',q:"Which data type is best for storing a single character like 'A'?",opts:["int","float","char","string"],ans:2,exp:"الإجابة: char ✅ — char يُستخدم لتخزين حرف واحد. string لسلسلة أحرف، int للأعداد الصحيحة، float للعشرية."},
+  {type:'mcq',q:"Which phase involves fixing bugs found after the software is released?",opts:["Development","Analysis","Maintenance","Design"],ans:2,exp:"الإجابة: Maintenance ✅ — مرحلة الصيانة تشمل إصلاح الأخطاء المكتشفة بعد الإصدار وإضافة تحسينات."},
+  {type:'mcq',q:"What does IDE stand for?",opts:["Integrated Development Environment","Internal Design Environment","International Data Engineering","Integrated Desktop Entry"],ans:0,exp:"الإجابة: Integrated Development Environment ✅ — بيئة التطوير المتكاملة تجمع المحرر والمترجم والمُصحّح في أداة واحدة. مثل: VS Code, Eclipse."},
+  {type:'mcq',q:"A Syntax Error is:",opts:["A mistake in the logic of the program","A violation of the language's grammar rules","An error that happens during calculation","A hardware failure"],ans:1,exp:"الإجابة: A violation of the language's grammar rules ✅ — خطأ الصياغة يحدث عند كسر قواعد اللغة (نسيان ;، خطأ في الكتابة)."},
+  {type:'mcq',q:"Which of the following is a valid C++ variable name?",opts:["2nd_Value","total-sum","_count","class"],ans:2,exp:"الإجابة: _count ✅ — يبدأ بـ(_) وهو مسموح. 2nd_Value يبدأ برقم، total-sum يحتوي (-) غير مسموح، class كلمة محجوزة.",tip:"💡 لو السؤال عن valid variable name → ابحث عن اللي يبدأ بحرف أو _، بدون مسافات أو رموز أو أرقام في الأول."},
+  {type:'mcq',q:"Which header file is required for using math functions like sqrt?",opts:["<math.h>","<stdio.h>","<ctype.h>","<fstream.h>"],ans:0,exp:"الإجابة: <math.h> ✅ — math.h (أو <cmath>) تحتوي دوال رياضية كـsqrt() وpow() وabs().",tip:"💡 لو شفت math functions (sqrt, pow) → <math.h> أو <cmath>."},
+  {type:'mcq',q:"The float data type typically uses how many bytes?",opts:["2","4","8","16"],ans:1,exp:"الإجابة: 4 bytes ✅ — float يشغل 4 bytes (32 bit). أما double فيشغل 8 bytes لدقة أعلى.",tip:"💡 لو شفت float + bytes → 4 bytes. double = 8 bytes."},
+  {type:'mcq',q:"What is the purpose of the Analysis phase?",opts:["Writing the code","Understanding what the user needs","Creating the user interface","Deleting old files"],ans:1,exp:"الإجابة: Understanding what the user needs ✅ — مرحلة التحليل تهدف لفهم متطلبات المستخدم وتحديد ما يحتاجه النظام.",tip:"💡 لو شفت Analysis phase → Understanding what the user needs (فهم المتطلبات)."},
+  {type:'mcq',q:"Which shape starts and ends a flowchart?",opts:["Rectangle","Diamond","Circle","Oval (Terminal)"],ans:3,exp:"الإجابة: Oval (Terminal) ✅ — الشكل البيضاوي أو الأسطوانة المستديرة يُمثّل بداية ونهاية المخطط الانسيابي.",tip:"💡 لو شفت starts + ends + flowchart → Oval/Terminal (الشكل البيضاوي)."},
+  {type:'mcq',q:"3rd Generation Languages (3GL) are also called:",opts:["Natural languages","Procedural languages","Object-oriented languages","Assembly languages"],ans:1,exp:"الإجابة: Procedural languages ✅ — لغات الجيل الثالث (C, Pascal, FORTRAN) تُسمى اللغات الإجرائية لأنها تصف كيفية تنفيذ الخطوات.",tip:"💡 لو شفت 3GL → Procedural languages (إجرائية) مثل C وPascal."},
+  {type:'mcq',q:"Which of these is NOT a low-level language?",opts:["C++","Machine language","Assembly language","All of the above are low-level"],ans:0,exp:"الإجابة: C++ ✅ — C++ لغة عالية المستوى (High-level). اللغات المنخفضة هي Machine Language وAssembly Language.",tip:"💡 لو شفت NOT low-level → C++ (هي High-level). Machine وAssembly = Low-level."},
+  {type:'mcq',q:"The escape sequence '\\n' in C++ is used for:",opts:["Tab space","New line","Backspace","Audible bell"],ans:1,exp:"الإجابة: New line ✅ — \\n تُحرّك المؤشر لسطر جديد. \\t=tab، \\b=backspace، \\a=bell.",tip:"💡 لو شفت \n → New line (سطر جديد). \t = tab, \b = backspace."},
+  {type:'mcq',q:"What is a Named Constant?",opts:["A variable that changes frequently","A memory location with a fixed value","A function name","A type of error"],ans:1,exp:"الإجابة: A memory location with a fixed value ✅ — الثابت المُسمّى (const) موقع ذاكرة له قيمة ثابتة لا تتغير طوال البرنامج.",tip:"💡 لو شفت Named Constant → A memory location with a fixed value."},
+  {type:'mcq',q:"Which operator is used for assignment in C++?",opts:["==",";","->","="],ans:3,exp:"الإجابة: = ✅ — = لتعيين القيمة (Assignment). أما == فللمقارنة (Comparison). مثال: x = 5; // تعيين.",tip:"💡 لو شفت assignment operator → = (علامة واحدة). == للمقارنة مش التعيين."},
+  {type:'mcq',q:"Documentation is important because:",opts:["It makes the program run faster","It helps others understand and maintain the code","It is required by the compiler","It reduces memory usage"],ans:1,exp:"الإجابة: It helps others understand and maintain the code ✅ — التوثيق يُسهّل على المبرمجين الآخرين فهم الكود وصيانته.",tip:"💡 لو شفت Documentation → helps others understand and maintain the code."},
+  {type:'mcq',q:"What does the linker do?",opts:["Finds syntax errors","Translates pseudocode","Executes the program","Connects object code with library code"],ans:3,exp:"الإجابة: Connects object code with library code ✅ — الرابط (Linker) يربط الكود الكائني بالمكتبات اللازمة لإنتاج الملف التنفيذي.",tip:"💡 لو شفت linker → Connects object code with library code."},
+  {type:'mcq',q:"Which data type would you use for true or false values?",opts:["int","double","bool","char"],ans:2,exp:"الإجابة: bool ✅ — نوع البيانات bool يُستخدم للقيم المنطقية (true أو false) في C++.",tip:"💡 لو شفت true/false values → bool دايماً."},
+  {type:'mcq',q:"In the Design phase, developers often use:",opts:["Compilers","Keyboards","Flowcharts and Pseudocode","Hard drives"],ans:2,exp:"الإجابة: Flowcharts and Pseudocode ✅ — في مرحلة التصميم يستخدم المبرمجون المخططات الانسيابية وشبه الكود لتوضيح منطق البرنامج.",tip:"💡 لو شفت Design phase + developers → Flowcharts and Pseudocode."},
+  {type:'mcq',q:"The output of a compiler is called:",opts:["Source code","Object code","Pseudocode","Algorithm"],ans:1,exp:"الإجابة: Object code ✅ — الكود الكائني (Object Code) هو الناتج من المترجم، يكون بصيغة قريبة من لغة الآلة ثم يُربط بالمكتبات.",tip:"💡 لو شفت output of compiler → Object code."}
+];
+
+let filter = 'all';
+let sideFilter = 'all'; // 'all' | 'correct' | 'wrong'
+let visibleQ = [];
+let currentIdx = 0;
+let answers = {};
+
+function setFilter(f){
+  filter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  buildVisible();
+  currentIdx = 0;
+  render();
+}
+
+function buildVisible(){
+  if(filter==='all') visibleQ = ALL.map((_,i)=>i);
+  else visibleQ = ALL.map((_,i)=>i).filter(i=>ALL[i].type===filter);
+}
+
+function isQCorrect(qi){
+  const a=answers[qi]; const q=ALL[qi];
+  if(a===undefined) return false;
+  if(q.type==='tf') return a===true;
+  return a===q.ans;
+}
+function isQWrong(qi){
+  const a=answers[qi]; const q=ALL[qi];
+  if(a===undefined) return false;
+  if(q.type==='tf') return a===false;
+  return a!==q.ans;
+}
+
+function buildPnums(){
+  const c = document.getElementById('pnums');
+  c.innerHTML='';
+  const mc = document.getElementById('mob-pnums');
+  if(mc) mc.innerHTML='';
+  // update active state of sf buttons (desktop + mobile)
+  ['correct','wrong'].forEach(f=>{
+    const btn=document.getElementById('sfbtn-'+f);
+    if(btn) btn.classList.toggle('active', sideFilter===f);
+    const mbtn=document.getElementById('mob-sfbtn-'+f);
+    if(mbtn) mbtn.classList.toggle('active', sideFilter===f);
+  });
+  // show/hide mobile "show all" button
+  const mobAll = document.getElementById('mob-sfbtn-all');
+  if(mobAll) mobAll.classList.toggle('visible', sideFilter!=='all');
+  visibleQ.forEach((qi,vi)=>{
+    const d = document.createElement('div');
+    const correct = isQCorrect(qi);
+    const wrong   = isQWrong(qi);
+    // hide based on sideFilter
+    let hidden = false;
+    if(sideFilter==='correct' && !correct) hidden=true;
+    if(sideFilter==='wrong'   && !wrong)   hidden=true;
+    let cls = 'pnum';
+    if(hidden) cls+=' hidden';
+    if(vi===currentIdx) cls+=' current';
+    if(correct) cls+=' correct';
+    else if(wrong) cls+=' wrong';
+    d.className=cls;
+    d.textContent=vi+1;
+    d.onclick=()=>{currentIdx=vi;render();};
+    c.appendChild(d);
+    // also add to mobile drawer pnums
+    if(mc){
+      const dm = d.cloneNode(true);
+      dm.onclick=()=>{currentIdx=vi;closeDrawer();render();};
+      mc.appendChild(dm);
+    }
+    if(vi===currentIdx && !hidden){
+      setTimeout(()=>d.scrollIntoView({block:'nearest',behavior:'smooth'}),50);
+    }
+  });
+}
+
+function updateStats(){
+  const total = visibleQ.length;
+  const correct = visibleQ.filter(qi=>{
+    const a=answers[qi]; const q=ALL[qi];
+    if(q.type==='tf') return a===true;
+    return a===q.ans;
+  }).length;
+  const wrong = visibleQ.filter(qi=>{
+    const a=answers[qi]; if(a===undefined) return false;
+    const q=ALL[qi];
+    if(q.type==='tf') return a===false;
+    return a!==q.ans;
+  }).length;
+  const answered= correct+wrong;
+  document.getElementById('s-q').textContent = currentIdx+1;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-cor').textContent = correct;
+  document.getElementById('s-wrg').textContent = wrong;
+  const pct = Math.round((answered/total)*100);
+  document.getElementById('fill').style.width = pct+'%';
+  // mini bars
+  const corPct = total>0 ? Math.round((correct/total)*100) : 0;
+  const wrgPct = total>0 ? Math.round((wrong/total)*100) : 0;
+  document.getElementById('bar-correct').style.width = corPct+'%';
+  document.getElementById('bar-wrong').style.width = wrgPct+'%';
+  document.getElementById('bar-cor-count').textContent = correct;
+  document.getElementById('bar-wrg-count').textContent = wrong;
+  // mobile bar sync
+  const mc=document.getElementById('mob-cor'); if(mc) mc.textContent=correct;
+  const mw=document.getElementById('mob-wrg'); if(mw) mw.textContent=wrong;
+  const mbc=document.getElementById('mob-bar-correct'); if(mbc) mbc.style.width=corPct+'%';
+  const mbw=document.getElementById('mob-bar-wrong'); if(mbw) mbw.style.width=wrgPct+'%';
+  const mbcc=document.getElementById('mob-bar-cor-count'); if(mbcc) mbcc.textContent=correct;
+  const mbwc=document.getElementById('mob-bar-wrg-count'); if(mbwc) mbwc.textContent=wrong;
+}
+
+function render(){
+  updateStats();
+  buildPnums();
+  if(visibleQ.length===0){document.getElementById('main').innerHTML='<p style="text-align:center;color:var(--muted);padding:2rem">No questions.</p>';return;}
+  const qi = visibleQ[currentIdx];
+  const q  = ALL[qi];
+  const done = answers[qi]!==undefined;
+
+  if(q.type==='tf') renderTF(qi,q,done);
+  else renderMCQ(qi,q,done);
+}
+
+function renderTF(qi,q,done){
+  const st = answers[qi]; // true=correct false=wrong
+  let tCls='', fCls='';
+  if(done){
+    if(q.ans===true){ tCls='correct'; if(st===false) fCls='wrong'; }
+    else { fCls='correct'; if(st===false) tCls='wrong'; }
+  }
+  document.getElementById('main').innerHTML=`
+    <div class="q-card tf">
+      <div class="q-meta">
+        <span class="q-index tf">Q ${currentIdx+1} / ${visibleQ.length}</span>
+        <span class="q-type">True / False</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="tf-row">
+        <button class="ans-btn ${tCls}" onclick="answerTF(${qi},true)"  ${done?'disabled':''}>✔ True</button>
+        <button class="ans-btn ${fCls}" onclick="answerTF(${qi},false)" ${done?'disabled':''}>✘ False</button>
+      </div>
+      <div class="explanation ${done?'show':''}">
+        <div class="exp-label">📖 Explanation</div>
+        ${done ? (()=>{
+          const userWasCorrect = answers[qi]===true;
+          const userClicked = userWasCorrect ? q.ans : !q.ans;
+          const chosenLabel = userClicked ? 'True' : 'False';
+          const correctLabel = q.ans ? 'True' : 'False';
+          return '<div class="exp-chosen ' + (userWasCorrect?'chosen-correct':'chosen-wrong') + '">'
+            + '<span class="chosen-icon">' + (userWasCorrect?'✅':'❌') + '</span>'
+            + '<span>اخترت: <strong>' + chosenLabel + '</strong></span>'
+            + (!userWasCorrect ? '<span class="chosen-correct-ans"> — الإجابة الصحيحة: <strong>' + correctLabel + '</strong></span>' : '')
+            + '</div>';
+        })() : ''}
+        ${q.exp}
+        ${q.tip ? '<div class="exp-tip"><div class="tip-label">🎯 Exam Tip</div>' + q.tip + '</div>' : ''}
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="go(-1)" ${currentIdx===0?'disabled':''}>← Previous</button>
+      <button class="nav-btn" onclick="go(1)">${currentIdx===visibleQ.length-1?'🏁 Results':'Next →'}</button>
+    </div>`;
+}
+
+function renderMCQ(qi,q,done){
+  const st = answers[qi]; // undefined | correct index stored as 'correct' or chosen index
+  const chosen = done ? answers[qi] : null;
+  const optsHTML = q.opts.map((o,i)=>{
+    let cls='opt-btn';
+    if(done){
+      if(i===q.ans) cls+=' correct';
+      else if(i===chosen && chosen!==q.ans) cls+=' wrong';
+    }
+    const lbl = ['A','B','C','D'][i];
+    return `<button class="${cls}" onclick="answerMCQ(${qi},${i})" ${done?'disabled':''}><span class="opt-label">${lbl}</span>${o}</button>`;
+  }).join('');
+  document.getElementById('main').innerHTML=`
+    <div class="q-card mcq">
+      <div class="q-meta">
+        <span class="q-index mcq">Q ${currentIdx+1} / ${visibleQ.length}</span>
+        <span class="q-type">MCQ</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="mcq-opts">${optsHTML}</div>
+      <div class="explanation ${done?'show':''}">
+        <div class="exp-label">📖 Explanation</div>
+        ${done ? (()=>{
+          const chosen = answers[qi];
+          const isCorrect = chosen === q.ans;
+          const labels = ['A','B','C','D'];
+          const chosenLabel = labels[chosen] + ' — ' + q.opts[chosen];
+          const correctLabel = labels[q.ans] + ' — ' + q.opts[q.ans];
+          return '<div class="exp-chosen ' + (isCorrect?'chosen-correct':'chosen-wrong') + '">'
+            + '<span class="chosen-icon">' + (isCorrect?'✅':'❌') + '</span>'
+            + '<span>اخترت: <strong>' + chosenLabel + '</strong></span>'
+            + (!isCorrect ? '<span class="chosen-correct-ans"> — الإجابة الصحيحة: <strong>' + correctLabel + '</strong></span>' : '')
+            + '</div>';
+        })() : ''}
+        ${q.exp}
+        ${q.tip ? '<div class="exp-tip"><div class="tip-label">🎯 Exam Tip</div>' + q.tip + '</div>' : ''}
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="go(-1)" ${currentIdx===0?'disabled':''}>← Previous</button>
+      <button class="nav-btn" onclick="go(1)">${currentIdx===visibleQ.length-1?'🏁 Results':'Next →'}</button>
+    </div>`;
+}
+
+function answerTF(qi,val){
+  if(answers[qi]!==undefined) return;
+  answers[qi] = (val===ALL[qi].ans);
+  render();
+}
+
+function answerMCQ(qi,chosen){
+  if(answers[qi]!==undefined) return;
+  answers[qi] = chosen; // store chosen index
+  render();
+}
+
+function go(dir){
+  const next = currentIdx+dir;
+  if(next<0) return;
+  if(next>=visibleQ.length){showResult();return;}
+  currentIdx=next;
+  render();
+}
+
+function showResult(){
+  const total   = visibleQ.length;
+  const correct = visibleQ.filter(qi=>{
+    const a=answers[qi]; const q=ALL[qi];
+    if(q.type==='tf') return a===true;
+    return a===q.ans;
+  }).length;
+  const wrong   = visibleQ.filter(qi=>{
+    const a=answers[qi]; const q=ALL[qi];
+    if(a===undefined) return false;
+    if(q.type==='tf') return a===false;
+    return a!==q.ans;
+  }).length;
+  const skipped = total-correct-wrong;
+  const pct = Math.round((correct/total)*100);
+  let grade,color;
+  if(pct>=90){grade='🏆 Excellent!';color='var(--green)';}
+  else if(pct>=75){grade='🎉 Very Good';color='var(--accent)';}
+  else if(pct>=60){grade='👍 Good';color='var(--amber)';}
+  else{grade='📚 Needs Revision';color='var(--red)';}
+
+  // section breakdown
+  const tfQ   = visibleQ.filter(qi=>ALL[qi].type==='tf');
+  const mcqQ  = visibleQ.filter(qi=>ALL[qi].type==='mcq');
+  const tfC   = tfQ.filter(qi=>answers[qi]===true).length;
+  const mcqC  = mcqQ.filter(qi=>answers[qi]===ALL[qi].ans).length;
+
+  document.getElementById('main').innerHTML=`
+    <div class="result-wrap">
+      <div class="result-circle" style="border-color:${color};color:${color}">${pct}%</div>
+      <div class="result-title" style="color:${color}">${grade}</div>
+      <div class="result-sub">You answered ${correct+wrong} of ${total} questions</div>
+      <div class="result-grid">
+        <div class="result-stat"><div class="result-stat-val" style="color:var(--green)">${correct}</div><div class="result-stat-lbl">Correct</div></div>
+        <div class="result-stat"><div class="result-stat-val" style="color:var(--red)">${wrong}</div><div class="result-stat-lbl">Wrong</div></div>
+        <div class="result-stat"><div class="result-stat-val" style="color:var(--muted)">${skipped}</div><div class="result-stat-lbl">Skipped</div></div>
+      </div>
+      ${tfQ.length&&mcqQ.length?`<div class="section-scores">
+        <div class="section-row"><span class="section-name">True / False</span><span class="section-val" style="color:var(--accent)">${tfC} / ${tfQ.length}</span></div>
+        <div class="section-row"><span class="section-name">MCQ</span><span class="section-val" style="color:var(--amber)">${mcqC} / ${mcqQ.length}</span></div>
+      </div>`:''}
+      <button class="restart-btn" onclick="restart()">🔄 Restart Quiz</button>
+    </div>`;
+  buildPnums();
+  updateStats();
+}
+
+function toggleDrawer(){
+  const d=document.getElementById('mob-drawer');
+  const o=document.getElementById('mob-overlay');
+  const b=document.getElementById('mob-drawer-btn');
+  const isOpen=d.classList.contains('open');
+  if(isOpen){ closeDrawer(); }
+  else { d.classList.add('open'); o.classList.add('open'); b.classList.add('open'); }
+}
+function closeDrawer(){
+  document.getElementById('mob-drawer')?.classList.remove('open');
+  document.getElementById('mob-overlay')?.classList.remove('open');
+  document.getElementById('mob-drawer-btn')?.classList.remove('open');
+}
+
+function setSideFilter(f){
+  sideFilter = (sideFilter===f) ? 'all' : f; // toggle
+  buildPnums();
+}
+
+function showAll(){
+  sideFilter = 'all';
+  buildPnums();
+}
+
+function fullReset(){
+  currentIdx=0;
+  answers={};
+  sideFilter='all';
+  filter='all';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.tab')?.classList.add('active');
+  buildVisible();
+  render();
+}
+
+function restart(){
+  currentIdx=0;
+  answers={};
+  sideFilter='all';
+  render();
+}
+
+// init
+buildVisible();
+render();
+</script>
+</body>
+</html>
